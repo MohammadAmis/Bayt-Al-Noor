@@ -1,0 +1,164 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#261900",
+                    "secondary-fixed-dim": "#e9c176",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-tertiary-container": "#cca89c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#2b160f",
+                    "secondary": "#775a19",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-tint": "#29695b",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#fed488",
+                    "outline-variant": "#bfc9c4",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary-fixed": "#ffdbce",
+                    "primary-fixed-dim": "#94d3c1",
+                    "inverse-surface": "#2e3132",
+                    "on-secondary-container": "#785a1a",
+                    "tertiary-container": "#573d34",
+                    "surface": "#f8f9fa",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#e4beb2",
+                    "on-surface-variant": "#3f4945",
+                    "secondary-fixed": "#ffdea5",
+                    "on-secondary-fixed-variant": "#5d4201",
+                    "on-primary-fixed-variant": "#065043",
+                    "background": "#f8f9fa",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#afefdd",
+                    "inverse-primary": "#94d3c1",
+                    "surface-dim": "#d9dadb",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e3e4",
+                    "on-tertiary-fixed-variant": "#5b4137",
+                    "tertiary": "#3e271f",
+                    "surface-container": "#edeeef",
+                    "outline": "#707975",
+                    "on-primary-container": "#7ebdac",
+                    "primary": "#00342b",
+                    "on-primary-fixed": "#00201a",
+                    "primary-container": "#004d40",
+                    "surface-bright": "#f8f9fa",
+                    "on-surface": "#191c1d",
+                    "on-background": "#191c1d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pulse-soft {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+        .bg-mesh {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(175, 239, 221, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 222, 165, 0.1) 0px, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- SafeAreaContainer: Full screen immersive splash container -->
+<main class="relative h-screen w-full flex flex-col items-center justify-between bg-mesh overflow-hidden">
+<!-- Top Visual Accent: Decorative Glassmorphism Element -->
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl"></div>
+<div class="absolute top-1/4 -right-12 w-48 h-48 bg-secondary-fixed/10 rounded-full blur-3xl"></div>
+<!-- Center Identity Cluster -->
+<div class="flex-1 flex flex-col items-center justify-center space-y-12 z-10">
+<!-- AppLogo: Geometric Islamic Pattern -->
+<div class="relative flex items-center justify-center">
+<!-- Outer decorative circle (Ghost Border style) -->
+<div class="absolute w-40 h-40 border border-primary/5 rounded-full animate-[spin_20s_linear_infinite]"></div>
+<div class="absolute w-36 h-36 border border-secondary/10 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+<!-- Main Logo Container -->
+<div class="relative bg-gradient-to-br from-primary to-primary-container p-8 rounded-full shadow-2xl shadow-primary/20 flex items-center justify-center w-28 h-28">
+<span class="material-symbols-outlined text-secondary-fixed text-6xl" style="font-variation-settings: 'FILL' 1;">
+                        auto_awesome_motion
+                    </span>
+<!-- Shine effect on logo -->
+<div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-full"></div>
+</div>
+</div>
+<!-- AppNameText: Elegant Serif Font -->
+<div class="text-center space-y-3">
+<h2 class="font-headline text-3xl md:text-4xl text-primary/80 font-medium tracking-wide mb-2">بَيْتُ النُّورِ</h2><h1 class="font-headline text-4xl md:text-5xl text-primary font-bold tracking-tight italic">Bayt Al-Noor</h1>
+<p class="font-body text-on-surface-variant text-sm tracking-[0.2em] uppercase font-medium">
+                    Celestial Prayer Companion
+                </p>
+</div>
+</div>
+<!-- Bottom Loading & Info Section -->
+<div class="pb-20 flex flex-col items-center space-y-8 z-10">
+<!-- LoadingIndicator: Subtle Pulse -->
+<div class="relative flex items-center justify-center space-x-2">
+<div class="w-2 h-2 rounded-full bg-primary pulse-soft" style="animation-delay: 0s;"></div>
+<div class="w-2 h-2 rounded-full bg-primary pulse-soft" style="animation-delay: 0.5s;"></div>
+<div class="w-2 h-2 rounded-full bg-primary pulse-soft" style="animation-delay: 1s;"></div>
+</div>
+<!-- Contextual Quote or Status (Secondary Content Area) -->
+<div class="px-8 text-center max-w-xs">
+<p class="text-on-surface-variant italic font-headline text-lg opacity-80">
+                    "Verily, in the remembrance of Allah do hearts find rest."
+                </p>
+</div>
+</div>
+<!-- Decorative Background Pattern (Low Opacity) -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center overflow-hidden">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="80" id="islamic-grid" patternunits="userSpaceOnUse" width="80">
+<path d="M40 0L80 40L40 80L0 40Z" fill="none" stroke="currentColor" stroke-width="1"></path>
+<circle cx="40" cy="40" fill="none" r="10" stroke="currentColor" stroke-width="1"></circle>
+</pattern>
+</defs>
+<rect class="text-primary" fill="url(#islamic-grid)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<!-- Bottom Ambient Lighting -->
+<div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-full h-64 bg-secondary-fixed/10 rounded-full blur-3xl"></div>
+</main>
+<!-- Background Image Layer (Subtle Backdrop) -->
+<div class="fixed inset-0 -z-10 pointer-events-none opacity-40">
+<img alt="" class="w-full h-full object-cover mix-blend-overlay" data-alt="Dreamy out of focus mosque silhouettes at sunrise with soft golden haze and ethereal morning mist across a peaceful landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVp9SzP0iJJtpUh_rwfPD6HqsJVs_z0j3lePiD1lSXnkp_XWqIXyogX2fmow69bLLTTaATU2hrNHSv7y8PVTwgjK0rWCD6-rqf3TfuqwOnUCbG0_ySC0DhHwXBJfKksnSnV8NI3nkHTj4cGEpRc_GqhtF-vE8NgAg8jEbaFeop1xgsqeM49_ajzOsljSU6Nnmfi4X2WKZbKhdmrxMFM7vITpEqfrtB7AWTogH1SwSMHU3kLRXuXodzvmuc_zCZw-gnvxiUUwzOsMk"/>
+</div>
+</body></html>

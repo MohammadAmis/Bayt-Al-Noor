@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notification Settings - The Sacred Rhythm</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-container": "#7ebdac",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "secondary-fixed": "#ffdea5",
+                    "outline": "#707975",
+                    "surface-variant": "#e1e3e4",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#afefdd",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "background": "#f8f9fa",
+                    "surface-container-high": "#e7e8e9",
+                    "on-tertiary-container": "#cca89c",
+                    "on-primary-fixed": "#00201a",
+                    "tertiary": "#3e271f",
+                    "surface-tint": "#29695b",
+                    "surface-bright": "#f8f9fa",
+                    "on-background": "#191c1d",
+                    "primary-fixed-dim": "#94d3c1",
+                    "on-surface-variant": "#3f4945",
+                    "on-primary-fixed-variant": "#065043",
+                    "tertiary-fixed": "#ffdbce",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#573d34",
+                    "surface-container-low": "#f3f4f5",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-secondary-fixed": "#261900",
+                    "secondary-container": "#fed488",
+                    "primary-container": "#004d40",
+                    "primary": "#00342b",
+                    "surface-dim": "#d9dadb",
+                    "tertiary-fixed-dim": "#e4beb2",
+                    "outline-variant": "#bfc9c4",
+                    "inverse-primary": "#94d3c1",
+                    "surface": "#f8f9fa",
+                    "on-secondary-container": "#785a1a",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#191c1d",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-tertiary-fixed-variant": "#5b4137",
+                    "on-tertiary-fixed": "#2b160f",
+                    "on-secondary-fixed-variant": "#5d4201",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#2e3132",
+                    "secondary": "#775a19",
+                    "secondary-fixed-dim": "#e9c176"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-emerald-50/80 dark:bg-emerald-950/80 backdrop-blur-xl w-full top-0 sticky z-50">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<button class="text-emerald-900 dark:text-emerald-50 hover:opacity-80 transition-opacity duration-300 scale-95 active:duration-300">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-serif italic text-xl text-emerald-900 dark:text-emerald-50">Notification Settings</h1>
+<button class="text-emerald-900 dark:text-emerald-50 hover:opacity-80 transition-opacity duration-300 scale-95 active:duration-300">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<main class="max-w-2xl mx-auto px-6 pt-8 space-y-10">
+<!-- Hero Section / Decorative Header -->
+<section class="relative overflow-hidden rounded-xl h-48 flex items-end p-8 bg-primary shadow-lg">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40 mix-blend-luminosity" data-alt="Abstract atmospheric photography of soft dust motes dancing in a single beam of golden light inside a quiet sacred space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEan5BqfhmSH6V6pZHNuwcGCew3N3XX9NecIoQa_8-_tsxmO4by34K7_SVsW77bvwOPED8SDioBEHTfEMBzr6-MifluAmtmpWfDR47BpDxB8W3t7lXNrox6YLcySzeRfJ6rSml-Fst0c_ZmdgYDUfZzN3MRKl8CkGpUK9sobT9D3ue6L1M7716qYm7rsHdYu7xdqg8B8jBbCSOjNExNJRnhkrTqgwhNMuDaepHKYYU_vyC1ZzuRDe0OozDe9qA4WN5yqklfSVxsJ4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10">
+<h2 class="font-serif text-3xl text-surface-container-lowest leading-tight">Sacred Alerts</h2>
+<p class="text-primary-fixed-dim text-sm mt-1 max-w-xs">Curate your rhythm of prayer with gentle, intentional reminders.</p>
+</div>
+</section>
+<!-- Global Toggle -->
+<div class="bg-surface-container-low rounded-lg p-6 flex items-center justify-between">
+<div class="space-y-1">
+<span class="font-semibold text-lg block">Master Alerts</span>
+<span class="text-on-surface-variant text-sm">Enable all prayer notifications</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-14 h-8 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Notification List -->
+<div class="space-y-4">
+<h3 class="font-serif text-xl px-2">Prayer Times</h3>
+<!-- Fajr -->
+<div class="bg-surface-container-lowest rounded-lg p-5 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="wb_twilight">wb_twilight</span>
+</div>
+<div>
+<span class="font-bold text-lg block">Fajr</span>
+<span class="text-on-surface-variant text-xs uppercase tracking-widest font-medium">Dawn Prayer</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container">
+<span class="text-sm text-on-surface-variant">Notify 10 mins before</span>
+<button class="px-4 py-2 text-primary font-bold text-sm bg-primary-fixed hover:opacity-80 transition-all rounded-lg">Adjust offset</button>
+</div>
+</div>
+<!-- Dhuhr -->
+<div class="bg-surface-container-lowest rounded-lg p-5 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="sunny">sunny</span>
+</div>
+<div>
+<span class="font-bold text-lg block">Dhuhr</span>
+<span class="text-on-surface-variant text-xs uppercase tracking-widest font-medium">Noon Prayer</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container">
+<span class="text-sm text-on-surface-variant">At exact time</span>
+<button class="px-4 py-2 text-primary font-bold text-sm bg-primary-fixed hover:opacity-80 transition-all rounded-lg">Adjust offset</button>
+</div>
+</div>
+<!-- Asr -->
+<div class="bg-surface-container-lowest rounded-lg p-5 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800">
+<span class="material-symbols-outlined" data-icon="partly_cloudy_day">partly_cloudy_day</span>
+</div>
+<div>
+<span class="font-bold text-lg block">Asr</span>
+<span class="text-on-surface-variant text-xs uppercase tracking-widest font-medium">Afternoon Prayer</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container opacity-50">
+<span class="text-sm text-on-surface-variant">Disabled</span>
+<button class="px-4 py-2 text-outline font-bold text-sm bg-surface-container-high rounded-lg cursor-not-allowed" disabled="">Adjust offset</button>
+</div>
+</div>
+<!-- Maghrib -->
+<div class="bg-surface-container-lowest rounded-lg p-5 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-900">
+<span class="material-symbols-outlined" data-icon="wb_twilight">wb_twilight</span>
+</div>
+<div>
+<span class="font-bold text-lg block">Maghrib</span>
+<span class="text-on-surface-variant text-xs uppercase tracking-widest font-medium">Sunset Prayer</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container">
+<span class="text-sm text-on-surface-variant">Notify 5 mins before</span>
+<button class="px-4 py-2 text-primary font-bold text-sm bg-primary-fixed hover:opacity-80 transition-all rounded-lg">Adjust offset</button>
+</div>
+</div>
+<!-- Isha -->
+<div class="bg-surface-container-lowest rounded-lg p-5 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-900">
+<span class="material-symbols-outlined" data-icon="bedtime">bedtime</span>
+</div>
+<div>
+<span class="font-bold text-lg block">Isha</span>
+<span class="text-on-surface-variant text-xs uppercase tracking-widest font-medium">Night Prayer</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container">
+<span class="text-sm text-on-surface-variant">At exact time</span>
+<button class="px-4 py-2 text-primary font-bold text-sm bg-primary-fixed hover:opacity-80 transition-all rounded-lg">Adjust offset</button>
+</div>
+</div>
+</div>
+<!-- Adhan Settings Card -->
+<section class="bg-primary p-8 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]" data-icon="volume_up">volume_up</span>
+</div>
+<div class="relative z-10 space-y-4">
+<h3 class="font-serif text-2xl text-primary-fixed">Adhan Sound</h3>
+<p class="text-on-primary-container text-sm">Select the melodic call for your notifications. Currently set to: <span class="text-white font-bold italic">Al-Aqsa Mosque</span></p>
+<button class="bg-secondary text-on-secondary font-bold px-6 py-3 rounded-lg shadow-lg hover:brightness-110 transition-all">Change Melody</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-emerald-50/90 dark:bg-emerald-950/90 backdrop-blur-xl z-50 rounded-t-3xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-emerald-800/50 dark:text-emerald-200/50 p-3 hover:text-teal-700 dark:hover:text-amber-100 transition-all duration-300 scale-90 active:ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome_motion">auto_awesome_motion</span>
+<span class="font-sans text-[10px] tracking-wider uppercase mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-800/50 dark:text-emerald-200/50 p-3 hover:text-teal-700 dark:hover:text-amber-100 transition-all duration-300 scale-90 active:ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-sans text-[10px] tracking-wider uppercase mt-1">Qibla</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-800/50 dark:text-emerald-200/50 p-3 hover:text-teal-700 dark:hover:text-amber-100 transition-all duration-300 scale-90 active:ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="ads_click">ads_click</span>
+<span class="font-sans text-[10px] tracking-wider uppercase mt-1">Tasbih</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-800/50 dark:text-emerald-200/50 p-3 hover:text-teal-700 dark:hover:text-amber-100 transition-all duration-300 scale-90 active:ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-sans text-[10px] tracking-wider uppercase mt-1">Community</span>
+</a>
+</nav>
+</body></html>

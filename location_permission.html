@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Sacred Rhythm - Location Access</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed": "#261900",
+                "secondary-fixed-dim": "#e9c176",
+                "surface-container-highest": "#e1e3e4",
+                "on-tertiary-container": "#cca89c",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed": "#2b160f",
+                "secondary": "#775a19",
+                "surface-container-low": "#f3f4f5",
+                "surface-tint": "#29695b",
+                "error": "#ba1a1a",
+                "secondary-container": "#fed488",
+                "outline-variant": "#bfc9c4",
+                "surface-container-high": "#e7e8e9",
+                "tertiary-fixed": "#ffdbce",
+                "primary-fixed-dim": "#94d3c1",
+                "inverse-surface": "#2e3132",
+                "on-secondary-container": "#785a1a",
+                "tertiary-container": "#573d34",
+                "surface": "#f8f9fa",
+                "inverse-on-surface": "#f0f1f2",
+                "on-primary": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "tertiary-fixed-dim": "#e4beb2",
+                "on-surface-variant": "#3f4945",
+                "secondary-fixed": "#ffdea5",
+                "on-secondary-fixed-variant": "#5d4201",
+                "on-primary-fixed-variant": "#065043",
+                "background": "#f8f9fa",
+                "on-error": "#ffffff",
+                "on-error-container": "#93000a",
+                "primary-fixed": "#afefdd",
+                "inverse-primary": "#94d3c1",
+                "surface-dim": "#d9dadb",
+                "error-container": "#ffdad6",
+                "surface-variant": "#e1e3e4",
+                "on-tertiary-fixed-variant": "#5b4137",
+                "tertiary": "#3e271f",
+                "surface-container": "#edeeef",
+                "outline": "#707975",
+                "on-primary-container": "#7ebdac",
+                "primary": "#00342b",
+                "on-primary-fixed": "#00201a",
+                "primary-container": "#004d40",
+                "surface-bright": "#f8f9fa",
+                "on-surface": "#191c1d",
+                "on-background": "#191c1d"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "1rem",
+                "xl": "1.5rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Noto Serif"],
+                "body": ["Manrope"],
+                "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-effect {
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-marker {
+            box-shadow: 0 0 30px 10px rgba(119, 90, 25, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- SafeAreaContainer: Minimalist centered container for the focused task -->
+<main class="min-h-screen flex flex-col items-center justify-between px-8 py-16 md:py-24 max-w-lg mx-auto overflow-hidden">
+<!-- Illustration Section -->
+<div class="relative w-full flex flex-col items-center justify-center flex-grow">
+<!-- Background Tonal Shifts (Instead of Borders) -->
+<div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-full blur-3xl -z-10 h-[400px] w-[400px] left-1/2 -translate-x-1/2"></div>
+<div class="relative w-full aspect-square flex items-center justify-center">
+<!-- LocationIllustration: Minimal Map Graphic -->
+<div class="relative w-64 h-64 bg-surface-container-low rounded-full flex items-center justify-center overflow-hidden">
+<!-- Abstract Map Pattern using Tonal Shifts -->
+<div class="absolute inset-0 opacity-20">
+<div class="absolute top-10 left-10 w-24 h-1 bg-outline-variant/30 rotate-45"></div>
+<div class="absolute top-24 right-4 w-32 h-1 bg-outline-variant/30 -rotate-12"></div>
+<div class="absolute bottom-16 left-8 w-40 h-1 bg-outline-variant/30 rotate-[30deg]"></div>
+<div class="absolute top-0 bottom-0 left-1/2 w-1 bg-outline-variant/30"></div>
+</div>
+<!-- Pulsing Marker -->
+<div class="relative">
+<div class="absolute inset-0 animate-ping rounded-full bg-secondary/20 scale-150"></div>
+<div class="w-16 h-16 bg-secondary-fixed text-on-secondary-fixed rounded-full flex items-center justify-center glow-marker shadow-lg shadow-secondary/20">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<!-- Secondary Decorative Elements (Celestial Compass Style) -->
+<div class="absolute top-12 right-12 w-12 h-12 rounded-full border border-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary/30 text-sm">explore</span>
+</div>
+<div class="absolute bottom-16 left-12 w-8 h-8 rounded-full bg-primary-fixed-dim/20"></div>
+</div>
+</div>
+<!-- Content Section -->
+<div class="w-full space-y-12 text-center mt-8">
+<div class="space-y-4">
+<!-- HeaderText: Enable Location -->
+<h1 class="font-headline text-3xl md:text-4xl text-on-surface font-bold tracking-tight">
+                    Enable Location
+                </h1>
+<!-- SubText: Explanation -->
+<p class="text-on-surface-variant leading-relaxed px-4 max-w-xs mx-auto">
+                    To provide accurate prayer times for your current city
+                </p>
+</div>
+<!-- Action Buttons -->
+<div class="w-full flex flex-col gap-4">
+<!-- AllowLocationButton: Primary Action -->
+<button class="group relative w-full h-14 bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-primary/10 hover:opacity-90 transition-all duration-300 active:scale-[0.98]">
+<span class="material-symbols-outlined text-xl">near_me</span>
+<span>Use current location</span>
+</button>
+<!-- ManualLocationButton: Secondary Text Button -->
+<button class="w-full h-14 bg-surface-container-highest text-primary font-medium rounded-lg hover:bg-surface-container-high transition-colors duration-300 active:scale-[0.98]">
+                    Search city manually
+                </button>
+</div>
+</div>
+<!-- Footer Privacy Note (Breathe) -->
+<footer class="mt-12 text-[10px] uppercase tracking-[0.2em] text-outline font-label font-bold">
+            Privacy First • No Tracking
+        </footer>
+</main>
+<!-- Invisible Shared Component Shell suppressed for Transactional screen (Focus flow) -->
+</body></html>
