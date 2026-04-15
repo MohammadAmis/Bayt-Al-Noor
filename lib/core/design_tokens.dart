@@ -63,21 +63,23 @@ class AppColors {
 }
 
 class AppTypography {
-  // Sacred (Serif)
-  static TextStyle get headline => GoogleFonts.notoSerif(
-    fontWeight: FontWeight.bold,
-  );
+  // Sacred (Serif) - Ideal for Arabic and elegant titles
+  static TextStyle get headline => GoogleFonts.amiri(
+        fontWeight: FontWeight.bold,
+        color: AppColors.primary,
+      );
 
-  static TextStyle get display => GoogleFonts.notoSerif(
-    fontWeight: FontWeight.bold,
-  );
+  static TextStyle get display => GoogleFonts.amiri(
+        fontWeight: FontWeight.bold,
+        color: AppColors.primary,
+      );
 
-  // Modern (Sans)
-  static TextStyle get body => GoogleFonts.manrope();
-  static TextStyle get label => GoogleFonts.manrope();
-  static TextStyle get title => GoogleFonts.manrope(
-    fontWeight: FontWeight.w600,
-  );
+  // Modern (Sans) - Clean and highly readable
+  static TextStyle get body => GoogleFonts.inter();
+  static TextStyle get label => GoogleFonts.inter();
+  static TextStyle get title => GoogleFonts.inter(
+        fontWeight: FontWeight.w600,
+      );
 }
 
 class AppShapes {

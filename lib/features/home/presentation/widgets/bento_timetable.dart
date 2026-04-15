@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:adhan/adhan.dart';
 import '../../../../core/design_tokens.dart';
+import '../../../../core/providers/hijri_date_provider.dart';
 
 class BentoTimetable extends StatelessWidget {
   final PrayerTimes prayerTimes;
@@ -156,7 +158,7 @@ class DateSelector extends StatelessWidget {
   }
 }
 
-class PrayerBentoList extends StatelessWidget {
+class PrayerBentoList extends ConsumerWidget {
   final PrayerTimes prayerTimes;
 
   const PrayerBentoList({
@@ -169,7 +171,7 @@ class PrayerBentoList extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final next = prayerTimes.nextPrayer();
 
     return Column(
@@ -182,6 +184,7 @@ class PrayerBentoList extends StatelessWidget {
           AppColors.primaryFixed,
           AppColors.onPrimaryFixed,
           isActive: next == Prayer.fajr,
+          hijriDate: ref.watch(hijriPrayerDateProvider(prayerTimes.fajr)),
         ),
         const SizedBox(height: 12),
         _buildBentoItem(
@@ -223,6 +226,7 @@ class PrayerBentoList extends StatelessWidget {
           AppColors.secondaryFixedDim,
           AppColors.onSecondaryFixedVariant,
           isActive: next == Prayer.maghrib,
+          hijriDate: ref.watch(hijriPrayerDateProvider(prayerTimes.maghrib)),
         ),
         const SizedBox(height: 12),
         _buildBentoItem(
@@ -245,7 +249,7 @@ class PrayerBentoList extends StatelessWidget {
     IconData icon, 
     Color iconBg, 
     Color iconColor,
-    {bool isActive = false, bool isDimmed = false}
+    {bool isActive = false, bool isDimmed = false, String? hijriDate}
   ) {
     return Container(
       padding: EdgeInsets.all(isActive ? 20 : 16),
@@ -341,13 +345,32 @@ class PrayerBentoList extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               // Time Display
-              Text(
-                time,
-                style: AppTypography.title.copyWith(
-                  fontSize: isActive ? 24 : 18,
-                  fontWeight: FontWeight.w300,
-                  color: isActive ? Colors.white : AppColors.onSurface,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    time,
+                    style: AppTypography.title.copyWith(
+                      fontSize: isActive ? 24 : 18,
+                      fontWeight: FontWeight.w300,
+                      color: isActive ? Colors.white : AppColors.onSurface,
+                    ),
+                  ),
+                  if (hijriDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        hijriDate.toUpperCase(),
+                        style: AppTypography.label.copyWith(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: isActive 
+                              ? Colors.white.withValues(alpha: 0.6) 
+                              : AppColors.onSurfaceVariant.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 16),
               // Indicator Container

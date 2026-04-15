@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'core/secrets.dart';
 import 'core/design_tokens.dart';
 import 'features/splash/presentation/pages/splash_screen_page.dart';
@@ -11,23 +12,52 @@ import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/pages/otp_verification_page.dart';
 import 'features/auth/presentation/pages/forgot_password_page.dart';
 import 'features/auth/presentation/pages/new_password_page.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'core/utils/app_lifecycle_notifier.dart';
+import 'core/providers/notification_orchestrator_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  await Hive.openBox('settingsBox');
 
   await Supabase.initialize(
     url: SupabaseSecrets.url,
     anonKey: SupabaseSecrets.anonKey,
   );
 
-  runApp(const ProviderScope(child: NamazTimerApp()));
+  // ✅ Initialize timezones
+  tz.initializeTimeZones();
+  try {
+    tz.setLocalLocation(tz.getLocation(DateTime.now().timeZoneName));
+  } catch (e) {
+    debugPrint('⚠️ Could not set local timezone from name: $e. Falling back to UTC.');
+  }
+
+  runApp(
+    ProviderScope(
+      child: Builder(
+        builder: (context) {
+          // ✅ Attach lifecycle observer early
+          final ref = ProviderScope.containerOf(context);
+          AppLifecycleNotifier(ref);
+          return const NamazTimerApp();
+        },
+      ),
+    ),
+  );
 }
 
-class NamazTimerApp extends StatelessWidget {
+class NamazTimerApp extends ConsumerWidget {
   const NamazTimerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ✅ Activate orchestrator to start listening for setting changes
+    ref.watch(notificationOrchestratorProvider);
+    
     return MaterialApp(
       title: 'Bayt-Al-Noor',
       debugShowCheckedModeBanner: false,
