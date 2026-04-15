@@ -29,12 +29,14 @@ class GlassContainer extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: color ?? AppColors.surfaceContainerLowest.withValues(alpha:0.7),
+            color: color ??
+                AppColors.surfaceContainerLowest.withValues(alpha: 0.7),
             borderRadius: borderRadius ?? AppShapes.lgRadius,
-            border: border ?? Border.all(
-              color: AppColors.outlineVariant.withValues(alpha:0.2),
-              width: 1,
-            ),
+            border: border ??
+                Border.all(
+                  color: AppColors.outlineVariant.withValues(alpha: 0.2),
+                  width: 1,
+                ),
           ),
           child: child,
         ),
@@ -64,12 +66,14 @@ class BentoCard extends StatelessWidget {
     return Container(
       padding: padding ?? const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: gradient == null ? (color ?? AppColors.surfaceContainerLowest) : null,
+        color: gradient == null
+            ? (color ?? AppColors.surfaceContainerLowest)
+            : null,
         gradient: gradient,
         borderRadius: AppShapes.lgRadius,
         boxShadow: [
           BoxShadow(
-            color: AppColors.onSurface.withValues(alpha:0.04),
+            color: AppColors.onSurface.withValues(alpha: 0.04),
             blurRadius: 24,
             offset: const Offset(0, 4),
           ),
@@ -85,7 +89,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String? subtitle;
   final String location;
   final VoidCallback? onMenuPressed;
-  final VoidCallback? onSearchPressed;
   final VoidCallback? onSettingsPressed;
   final VoidCallback? onProfilePressed;
   final IconData? leadingIcon;
@@ -97,7 +100,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.subtitle,
     required this.location,
     this.onMenuPressed,
-    this.onSearchPressed,
     this.onSettingsPressed,
     this.onProfilePressed,
     this.leadingIcon,
@@ -109,10 +111,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     return GlassContainer(
       blur: 20,
       borderRadius: BorderRadius.zero,
-      color: AppColors.surfaceContainerLow.withValues(alpha:0.9),
+      color: AppColors.surfaceContainerLow.withValues(alpha: 0.9),
       border: Border(
         bottom: BorderSide(
-          color: AppColors.outlineVariant.withValues(alpha:0.1),
+          color: AppColors.outlineVariant.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -132,18 +134,23 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.primary.withValues(alpha:0.1), width: 1.5),
+                            border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                width: 1.5),
                           ),
                           child: CircleAvatar(
                             radius: 18,
-                            backgroundImage: NetworkImage(profileImageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y'),
+                            backgroundImage: NetworkImage(profileImageUrl ??
+                                'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y'),
                           ),
                         ),
                       )
                     : (Navigator.canPop(context) || leadingIcon != null)
                         ? IconButton(
-                            onPressed: onMenuPressed ?? () => Navigator.maybePop(context),
-                            icon: Icon(leadingIcon ?? Icons.arrow_back, color: AppColors.primary),
+                            onPressed: onMenuPressed ??
+                                () => Navigator.maybePop(context),
+                            icon: Icon(leadingIcon ?? Icons.arrow_back,
+                                color: AppColors.primary),
                           )
                         : const SizedBox.shrink(),
               ),
@@ -183,7 +190,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.location_on, size: 12, color: AppColors.primary),
+                        const Icon(Icons.location_on,
+                            size: 12, color: AppColors.primary),
                         const SizedBox(width: 4),
                         Text(
                           location.toUpperCase(),
@@ -205,18 +213,17 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  IconButton(
-                    onPressed: onSearchPressed,
-                    icon: Icon(Icons.search, color: AppColors.onSurface.withValues(alpha:0.6)),
-                  ),
                   if (onSettingsPressed != null)
                     IconButton(
                       onPressed: onSettingsPressed,
-                      icon: const Icon(Icons.settings_outlined, size: 22, color: AppColors.primary),
+                      icon: const Icon(Icons.settings_outlined,
+                          size: 22, color: AppColors.primary),
                     ),
-                  if (onSettingsPressed == null && onProfilePressed != null && Navigator.canPop(context))
+                  if (onSettingsPressed == null &&
+                      onProfilePressed != null &&
+                      Navigator.canPop(context))
                     // If we are nested, we can still show a small profile button or keep it clean
-                    const SizedBox(width: 40), 
+                    const SizedBox(width: 40),
                 ],
               ),
             ],

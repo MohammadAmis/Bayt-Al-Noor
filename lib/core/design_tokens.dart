@@ -49,6 +49,27 @@ class AppColors {
   static const Color error = Color(0xFFBA1A1A);
   static const Color onError = Color(0xFFFFFFFF);
 
+  static const Color errorContainer = Color(0xFFFDECEE);
+  static const Color onErrorContainer = Color(0xFFB00020);
+
+  // ✅ Celestial Theme Colors
+  static const Color celestialBg = Color(0xFF0A1929);      // Deep navy
+  static const Color celestialGold = Color(0xFFD4AF37);    // Islamic gold
+  static const Color celestialGoldLight = Color(0xFFF4E4BC); // Soft gold
+  static const Color celestialSilver = Color(0xFFC0C0C0);  // Silver accents
+  static const Color celestialGlow = Color(0x40D4AF37);    // Gold glow (alpha)
+  
+  // Compass specific
+  static const Color compassFace = Color(0xFF1E3A5F);      // Compass dial bg
+  static const Color compassMarking = Color(0xFF94A3B8);   // Degree lines
+  static const Color compassText = Color(0xFFE2E8F0);      // Direction labels
+
+
+  
+
+  static Color withAlpha(Color color, double alpha) => 
+      color.withValues(alpha: alpha);
+
   // Gradients
   static const RadialGradient radialHighlight = RadialGradient(
     colors: [Color(0xFFFFDEA5), Colors.transparent],
@@ -80,6 +101,29 @@ class AppTypography {
   static TextStyle get title => GoogleFonts.inter(
         fontWeight: FontWeight.w600,
       );
+
+  // ✅ Compass-specific typography
+  static const TextStyle compassDegree = TextStyle(
+    fontFamily: 'Segoe UI',
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    color: AppColors.compassMarking,
+  );
+  
+  static const TextStyle compassDirection = TextStyle(
+    fontFamily: 'Segoe UI',
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    color: AppColors.compassText,
+  );
+  
+  static const TextStyle compassQiblaLabel = TextStyle(
+    fontFamily: 'Segoe UI',
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    color: AppColors.celestialGold,
+    letterSpacing: 1.5,
+  );
 }
 
 class AppShapes {
@@ -92,10 +136,24 @@ class AppShapes {
   static BorderRadius get lgRadius => BorderRadius.circular(radiusLg);
   static BorderRadius get xlRadius => BorderRadius.circular(radiusXl);
   static BorderRadius get fullRadius => BorderRadius.circular(radiusFull);
+  static const BorderRadius compassRadius = BorderRadius.all(Radius.circular(100));
+  static const BorderRadius cardRadius = BorderRadius.all(Radius.circular(16));
+  static const BorderRadius buttonRadius = BorderRadius.all(Radius.circular(12));
+  static const BorderRadius mdRadius = BorderRadius.all(Radius.circular(8));
 }
 
 class AppAnimations {
   static const Duration slow = Duration(milliseconds: 500);
   static const Duration normal = Duration(milliseconds: 300);
   static const Duration fast = Duration(milliseconds: 150);
+  // ✅ Compass animations
+  static const Duration compassAnimation = Duration(milliseconds: 800);
+  static const Curve compassCurve = Curves.elasticOut;
+  
+  // ✅ Particle/background animations
+  static const Duration pulseAnimation = Duration(seconds: 3);
+  
+  // ✅ General easing curves
+  static const Curve gentleCurve = Curves.easeInOut;
+  static const Curve bounceCurve = Curves.bounceOut;
 }

@@ -51,7 +51,6 @@ class _QuranReadingPageState extends State<QuranReadingPage> {
         title: 'Bayt Al-Noor',
         subtitle: 'بَيْتُ النُّورِ',
         location: 'London, UK',
-        onSearchPressed: () {},
         onMenuPressed: () => Navigator.pop(context),
         leadingIcon: Icons.arrow_back,
       ),

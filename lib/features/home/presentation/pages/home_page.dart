@@ -131,7 +131,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               data: (loc) => loc?.displayAddress ?? 'Unknown',
               orElse: () => data.cityName.toUpperCase(),
             ),
-            onSearchPressed: () {},
             onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
             onProfilePressed: () => Navigator.push(
               context,

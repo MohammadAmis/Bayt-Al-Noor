@@ -24,7 +24,6 @@ class _CommunityPageState extends State<CommunityPage> {
         title: 'Bayt Al-Noor',
         subtitle: 'بَيْتُ النُّورِ',
         location: 'London, UK',
-        onSearchPressed: () {},
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,

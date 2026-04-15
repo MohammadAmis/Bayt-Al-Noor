@@ -48,17 +48,19 @@ dependencies:
   shared_preferences: ^2.3.2
   app_links: ^7.0.0
   flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.5
   flutter_local_notifications: ^16.3.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   connectivity_plus: ^5.0.2
   timezone: ^0.9.2
   equatable: ^2.0.5
+  permission_handler: ^12.0.1
+  rxdata: ^0.8.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  riverpod_generator: ^2.4.9
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
