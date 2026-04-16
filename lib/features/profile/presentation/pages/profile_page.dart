@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/design_tokens.dart';
+import '../../../../core/widgets/common_widgets.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String name;
@@ -29,12 +30,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
       length: 3,
       child: Scaffold(
         backgroundColor: AppColors.surface,
+        appBar: AppTopBar(
+          title: 'Profile',
+          isMainScreen: false,
+          location: '',
+          onMenuPressed: () => Navigator.pop(context),
+          onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
+        ),
         body: SafeArea(
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverToBoxAdapter(
-                child: _buildHeader(),
-              ),
               SliverToBoxAdapter(
                 child: _buildProfileIdentity(),
               ),
@@ -87,32 +92,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
-          ),
-          Text(
-            'Your Sanctuary',
-            style: AppTypography.headline.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.onSurface,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings, color: AppColors.onSurface),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildProfileIdentity() {
     return Padding(

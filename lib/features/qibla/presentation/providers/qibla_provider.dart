@@ -103,7 +103,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
 
       // Start compass heading listener for real-time rotation
       _startHeadingListener();
-    } catch (e, stack) {
+    } catch (e) {
       // In production: log to FirebaseCrashlytics
       state = state.copyWith(
         isLoading: false,

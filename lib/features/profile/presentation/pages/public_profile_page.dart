@@ -37,9 +37,10 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
         backgroundColor: AppColors.surface,
         appBar: AppTopBar(
           title: 'User Profile',
-          location: 'Community Hub',
-          leadingIcon: Icons.arrow_back,
+          isMainScreen: false,
+          location: '',
           onMenuPressed: () => Navigator.pop(context),
+          onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         ),
         body: SafeArea(
           child: NestedScrollView(

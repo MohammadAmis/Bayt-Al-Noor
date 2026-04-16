@@ -20,6 +20,7 @@ class NotificationScheduler {
     required bool enabled,
     required int offsetMinutes,
     required bool enableSound,
+    required Map<String, bool> enabledPrayers,
     VoidCallback? onComplete,
     void Function(String error)? onError,
   }) async {
@@ -40,7 +41,6 @@ class NotificationScheduler {
         // Calculate prayer times using adhan
         final coordinates = adhan.Coordinates(location.latitude, location.longitude);
         final calculationParams = method.toAdhan().getParameters();
-        final today = adhan.DateComponents.from(DateTime.now());
         final prayerTimes = adhan.PrayerTimes.today(coordinates, calculationParams);
 
         // Schedule notifications
@@ -48,6 +48,7 @@ class NotificationScheduler {
           prayerTimes: prayerTimes,
           offsetMinutes: offsetMinutes,
           enableSound: enableSound,
+          enabledPrayers: enabledPrayers,
         );
         
         debugPrint('✅ Notifications rescheduled for ${location.displayAddress} '
@@ -71,6 +72,7 @@ class NotificationScheduler {
     required bool enabled,
     required int offsetMinutes,
     required bool enableSound,
+    required Map<String, bool> enabledPrayers,
     VoidCallback? onComplete,
     void Function(String error)? onError,
   }) async {
@@ -81,6 +83,7 @@ class NotificationScheduler {
       enabled: enabled,
       offsetMinutes: offsetMinutes,
       enableSound: enableSound,
+      enabledPrayers: enabledPrayers,
       onComplete: onComplete,
       onError: onError,
     );

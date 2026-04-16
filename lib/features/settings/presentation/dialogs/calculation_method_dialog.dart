@@ -10,7 +10,7 @@ class CalculationMethodDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentMethod = ref.watch(calculationMethodProvider);
-    
+
     return AlertDialog(
       backgroundColor: AppColors.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: AppShapes.xlRadius),
@@ -22,26 +22,41 @@ class CalculationMethodDialog extends ConsumerWidget {
         width: double.maxFinite,
         constraints: const BoxConstraints(maxHeight: 400),
         child: ListView(
+          shrinkWrap: true,
           children: CalculationMethodOption.values.map((method) {
-            return RadioListTile<CalculationMethodOption>(
+            final isSelected = currentMethod == method;
+
+            return ListTile(
               title: Text(
                 method.displayName,
-                style: AppTypography.body.copyWith(color: AppColors.onSurface),
+                style: AppTypography.body.copyWith(
+                  color: isSelected ? AppColors.primary : AppColors.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
               subtitle: Text(
                 method.recommendedRegions,
-                style: AppTypography.label.copyWith(color: AppColors.onSurfaceVariant, fontSize: 11),
+                style: AppTypography.label.copyWith(
+                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                  fontSize: 11,
+                ),
               ),
-              value: method,
-              groupValue: currentMethod,
-              activeColor: AppColors.primary,
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(calculationMethodProvider.notifier).update(value);
-                  Navigator.pop(context);
-                }
-              },
+              leading: Radio<CalculationMethodOption>(
+                value: method,
+                groupValue: currentMethod,
+                activeColor: AppColors.primary,
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(calculationMethodProvider.notifier).update(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+              onTap: () {
+                ref.read(calculationMethodProvider.notifier).update(method);
+                Navigator.pop(context);
+              },
             );
           }).toList(),
         ),
@@ -49,7 +64,8 @@ class CalculationMethodDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancel', style: AppTypography.label.copyWith(color: AppColors.primary)),
+          child: Text('Cancel',
+              style: AppTypography.label.copyWith(color: AppColors.primary)),
         ),
       ],
     );

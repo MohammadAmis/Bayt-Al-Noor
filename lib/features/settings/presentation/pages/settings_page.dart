@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/common_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../../core/design_tokens.dart';
 import '../../../../../core/providers/connectivity_provider.dart';
@@ -28,12 +30,11 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        title: Text('Settings', style: AppTypography.title),
-        centerTitle: true,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.onSurface,
-        elevation: 0,
+      appBar: AppTopBar(
+        title: 'Settings',
+        isMainScreen: false,
+        location: '', // Not used for SubScreen
+        onSettingsPressed: () {}, // Already on settings
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -339,11 +340,17 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  void _openPrivacyPolicy(BuildContext context) {
-    // TODO: Open webview or URL launcher with privacy policy
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Privacy policy opening...')),
-    );
+  void _openPrivacyPolicy(BuildContext context) async {
+    final Uri url = Uri.parse('https://github.com/MohammadAmis/Bayt-Al-Noor/blob/main/PRIVACY.md');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open privacy policy')),
+        );
+      }
+    }
   }
 }
 

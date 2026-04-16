@@ -2,150 +2,117 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:adhan/adhan.dart';
 import '../../../../core/design_tokens.dart';
-import '../../../../core/widgets/common_widgets.dart';
-import '../../../../core/services/prayer_service.dart';
 
 class MilestoneGrid extends StatelessWidget {
   final PrayerTimes prayerTimes;
-  
+
   const MilestoneGrid({
     super.key,
     required this.prayerTimes,
   });
 
   String _format(DateTime time) {
-    return DateFormat('HH:mm').format(time);
+    return DateFormat('h:mm a').format(time);
   }
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final prayerService = PrayerService.instance;
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Calculate width to show exactly 3.5 items
+    final itemWidth = (screenWidth - 32) / 3.5; // 32 is standard horizontal padding
 
-    // Logic for Dynamic Swapping
-    final hasSunRisen = now.isAfter(prayerTimes.sunrise);
-
-    // Slot 1: Sehri Ends OR Ishraq
-    final slot1Label = hasSunRisen ? 'Ishraq' : 'Sehri Ends';
-    final slot1Time = hasSunRisen 
-        ? _format(prayerService.getIshraqTime(prayerTimes.sunrise))
-        : _format(prayerTimes.fajr);
-    final slot1Icon = hasSunRisen ? Icons.wb_twilight : Icons.brightness_3;
-    final slot1Color = hasSunRisen ? AppColors.primary : AppColors.secondary;
-
-    // Slot 2: Sunrise OR Zawal
-    // We show Zawal once we are approaching Dhuhr (e.g., after 11 AM)
-    final isApproachZawal = now.hour >= 11 && now.isBefore(prayerTimes.dhuhr);
-    final slot2Label = isApproachZawal ? 'Zawal (Start)' : 'Sunrise';
-    final slot2Time = isApproachZawal 
-        ? _format(prayerService.getZawalTime(prayerTimes.dhuhr))
-        : _format(prayerTimes.sunrise);
-    final slot2Icon = isApproachZawal ? Icons.timer_outlined : Icons.wb_sunny;
-
-    return BentoCard(
-      padding: const EdgeInsets.all(20),
-      color: AppColors.surfaceContainerLowest,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildMilestoneItem(
-                  slot1Label,
-                  slot1Time,
-                  slot1Icon,
-                  slot1Color.withValues(alpha:0.1),
-                  slot1Color,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildMilestoneItem(
-                  slot2Label,
-                  slot2Time,
-                  slot2Icon,
-                  AppColors.primary.withValues(alpha:0.1),
-                  AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: _buildMilestoneItem(
-                  'Iftar Starts',
-                  _format(prayerTimes.maghrib),
-                  Icons.nights_stay,
-                  AppColors.tertiary.withValues(alpha:0.1),
-                  AppColors.tertiary,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildMilestoneItem(
-                  'Sunset',
-                  _format(prayerTimes.maghrib), // adhan sunset is maghrib
-                  Icons.wb_twilight,
-                  AppColors.outline.withValues(alpha:0.1),
-                  AppColors.outline,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMilestoneItem(
-    String label,
-    String time,
-    IconData icon,
-    Color bgColor,
-    Color iconColor,
-  ) {
-    return Row(
+    return Column(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: iconColor, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
             children: [
-              Text(
-                label.toUpperCase(),
-                style: AppTypography.label.copyWith(
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onSurfaceVariant,
-                  letterSpacing: 0.5,
-                ),
-                overflow: TextOverflow.ellipsis,
+              _buildMilestoneChip(
+                itemWidth,
+                'SUNRISE',
+                _format(prayerTimes.sunrise),
+                Icons.wb_sunny_rounded,
+                AppColors.sunriseGold,
               ),
-              Text(
-                time,
-                style: AppTypography.headline.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onSurface,
-                ),
-                overflow: TextOverflow.ellipsis,
+              _buildMilestoneChip(
+                itemWidth,
+                'SUNSET',
+                _format(prayerTimes.maghrib),
+                Icons.wb_twilight_rounded,
+                AppColors.sunsetCrimson,
+              ),
+              _buildMilestoneChip(
+                itemWidth,
+                'IFTAR',
+                _format(prayerTimes.maghrib),
+                Icons.mosque_rounded,
+                AppColors.iftarEmerald,
+              ),
+              _buildMilestoneChip(
+                itemWidth,
+                'SEHRI',
+                _format(prayerTimes.fajr),
+                Icons.nightlight_round,
+                AppColors.sehriIndigo,
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMilestoneChip(
+    double width,
+    String label,
+    String time,
+    IconData icon,
+    Color themeColor,
+  ) {
+    return Container(
+      width: width,
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: themeColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: themeColor.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: themeColor,
+            size: 20,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: AppTypography.label.copyWith(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: themeColor.withValues(alpha: 0.7),
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            time,
+            style: AppTypography.headline.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.onSurface,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

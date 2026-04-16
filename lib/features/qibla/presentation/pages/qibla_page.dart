@@ -10,7 +10,6 @@ import '../../../../../core/widgets/common_widgets.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../providers/qibla_provider.dart';
 import '../widgets/compass_dial.dart';
-import '../widgets/qibla_display_card.dart';
 import '../widgets/location_card.dart';
 import '../widgets/recalibrate_button.dart';
 
@@ -26,35 +25,14 @@ class QiblaPage extends ConsumerStatefulWidget {
 
 class _QiblaPageState extends ConsumerState<QiblaPage> {
   @override
-  void initState() {
-    super.initState();
-
-    // Initialize Qibla after first frame (ensures providers are ready)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeQibla();
-    });
-  }
-
-  /// Initialize Qibla: wait for location if needed, then calculate
-  void _initializeQibla() {
-    // ✅ Read your existing provider: Provider<AsyncValue<AppLocation?>>
-    final locationAsync = ref.read(locationProvider);
-
-    if (locationAsync.value != null) {
-      // ✅ Location already loaded: calculate immediately
-      ref.read(qiblaProvider.notifier).initialize();
-    } else {
-      // ⏳ Location still loading: listen for changes, then calculate
-      ref.listen<AsyncValue<AppLocation?>>(locationProvider, (previous, next) {
-        if (next.value != null) {
-          ref.read(qiblaProvider.notifier).initialize();
-        }
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // ⏳ Location side-effect: Listen for location arrival to initialize Qibla
+    ref.listen<AsyncValue<AppLocation?>>(locationProvider, (previous, next) {
+      if (next.value != null) {
+        ref.read(qiblaProvider.notifier).initialize();
+      }
+    });
+
     // Watch Qibla state
     final qiblaState = ref.watch(qiblaProvider);
 
@@ -65,18 +43,14 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
       extendBody: true,
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
-        title: 'Bayt Al-Noor',
-        subtitle: 'بَيْتُ النُّورِ',
-        // ✅ Use AppLocation.displayAddress (from your extension)
-        location: locationAsync.maybeWhen(
-          data: (appLoc) => appLoc?.displayAddress ?? 'Loading...',
-          orElse: () => 'Unknown',
-        ),
+        title: 'Qibla',
+        isMainScreen: true,
+        location: 'Qibla Finder',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserProfilePage(
+            builder: (context) => const UserProfilePage(
               name: 'Fatima Al-Sayed',
               avatarUrl:
                   'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y',
@@ -87,88 +61,78 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
         child: Column(
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-              child: Column(
-                children: [
-                  // Section Header
-                  _buildHeader(),
-                  const SizedBox(height: 16),
+            // Section Header
+            _buildHeader(),
+            const SizedBox(height: 16),
 
-                  // State handling: Loading / Error / Success
-                  if (qiblaState.isLoading && qiblaState.direction == null)
-                    const _LoadingState()
-                  else if (qiblaState.error != null)
-                    _ErrorState(
-                      message: qiblaState.error!,
-                      onRetry: () =>
-                          ref.read(qiblaProvider.notifier).recalibrate(),
-                    )
-                  else if (qiblaState.direction != null) ...[
-                    // ✅ Success: Show compass with real-time heading
-                    // In your build() method, the CompassDial usage stays the same:
-                    CompassDial(
-                      qiblaDirection: qiblaState.direction!,
-                      deviceHeading: qiblaState.deviceHeading,
-                      size: 300,
-                      onAligned: () {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('✓ You are facing the Qibla'),
-                              backgroundColor: AppColors.celestialGold,
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    SizedBox(height: 16),
-
-                    // User Location Card (using your AppLocation)
-                    LocationCard(
-                      location: qiblaState.direction!.userLocation,
-                      locationName: locationAsync.value?.displayAddress,
-                    ),
-                  ],
-
-                  const SizedBox(height: 32),
-
-                  // Recalibrate Button
-                  RecalibrateButton(
-                    isLoading: qiblaState.isCalibrating,
-                    onPressed: () =>
-                        ref.read(qiblaProvider.notifier).recalibrate(),
-                  ),
-
-                  // Manual location input (web fallback)
-                  if (kIsWeb) ...[
-                    const SizedBox(height: 16),
-                    TextButton.icon(
-                      onPressed: () async {
-                        final coords = await _showLocationInputDialog();
-                        if (coords != null && mounted) {
-                          ref.read(qiblaProvider.notifier).useManualLocation(
-                                coords.latitude,
-                                coords.longitude,
-                                address: coords.address,
-                              );
-                        }
-                      },
-                      icon: const Icon(Icons.edit_location, size: 18),
-                      label: const Text('Enter Location Manually'),
-                      style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primary),
-                    ),
-                  ],
-                ],
+            // State handling: Loading / Error / Success
+            if (qiblaState.isLoading && qiblaState.direction == null)
+              const _LoadingState()
+            else if (qiblaState.error != null)
+              _ErrorState(
+                message: qiblaState.error!,
+                onRetry: () => ref.read(qiblaProvider.notifier).recalibrate(),
+              )
+            else if (qiblaState.direction != null) ...[
+              // ✅ Success: Show compass with real-time heading
+              CompassDial(
+                qiblaDirection: qiblaState.direction!,
+                deviceHeading: qiblaState.deviceHeading,
+                size: 300,
+                onAligned: () {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✓ You are facing the Qibla'),
+                        backgroundColor: AppColors.celestialGold,
+                        duration: Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                },
               ),
+              const SizedBox(height: 16),
+
+              // User Location Card
+              LocationCard(
+                location: qiblaState.direction!.userLocation,
+                locationName: locationAsync.value?.displayAddress,
+              ),
+            ],
+
+            const SizedBox(height: 32),
+
+            // Recalibrate Button
+            RecalibrateButton(
+              isLoading: qiblaState.isCalibrating,
+              onPressed: () => ref.read(qiblaProvider.notifier).recalibrate(),
             ),
+
+            // Manual location input (web fallback)
+            if (kIsWeb) ...[
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: () async {
+                  final coords = await _showLocationInputDialog();
+                  if (coords != null && context.mounted) {
+                    ref.read(qiblaProvider.notifier).useManualLocation(
+                          coords.latitude,
+                          coords.longitude,
+                          address: coords.address,
+                        );
+                  }
+                },
+                icon: const Icon(Icons.edit_location, size: 18),
+                label: const Text('Enter Location Manually'),
+                style:
+                    TextButton.styleFrom(foregroundColor: AppColors.primary),
+              ),
+            ],
+            const SizedBox(height: 120), // Bottom spacing for FAB
           ],
         ),
       ),
@@ -231,7 +195,7 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
               // Latitude
               TextField(
                 controller: latController,
-                keyboardType: TextInputType.numberWithOptions(
+                keyboardType: const TextInputType.numberWithOptions(
                     decimal: true, signed: true),
                 decoration: const InputDecoration(
                   labelText: 'Latitude',
@@ -245,7 +209,7 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
               // Longitude
               TextField(
                 controller: lonController,
-                keyboardType: TextInputType.numberWithOptions(
+                keyboardType: const TextInputType.numberWithOptions(
                     decimal: true, signed: true),
                 decoration: const InputDecoration(
                   labelText: 'Longitude',
@@ -342,7 +306,7 @@ class _LoadingState extends StatelessWidget {
         color: AppColors.compassFace,
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.celestialGold.withValues(alpha: 0.3),
+          color: AppColors.withAlpha(AppColors.celestialGold, 0.3),
           width: 1,
         ),
       ),
@@ -385,7 +349,7 @@ class _ErrorState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.error_outline, color: AppColors.error, size: 48),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 48),
           const SizedBox(height: 16),
           Text(
             message,

@@ -32,6 +32,7 @@ final notificationOrchestratorProvider = Provider<void>((ref) {
     final enabled = ref.read(notificationsEnabledProvider);
     final offset = ref.read(notificationOffsetProvider);
     final sound = ref.read(notificationSoundProvider);
+    final enabledPrayers = ref.read(allPrayerNotificationsProvider);
     
     // ✅ Signal scheduling start
     statusNotifier.start();
@@ -42,6 +43,7 @@ final notificationOrchestratorProvider = Provider<void>((ref) {
       enabled: enabled,
       offsetMinutes: offset,
       enableSound: sound,
+      enabledPrayers: enabledPrayers,
       onComplete: () => statusNotifier.complete(),
       onError: (e) => statusNotifier.fail(e),
     );
@@ -53,6 +55,7 @@ final notificationOrchestratorProvider = Provider<void>((ref) {
   ref.listen<bool>(notificationsEnabledProvider, (_, __) => triggerSchedule());
   ref.listen<int>(notificationOffsetProvider, (_, __) => triggerSchedule());
   ref.listen<bool>(notificationSoundProvider, (_, __) => triggerSchedule());
+  ref.listen<Map<String, bool>>(allPrayerNotificationsProvider, (_, __) => triggerSchedule());
 
   // 🚀 Initial schedule on app start
   triggerSchedule();

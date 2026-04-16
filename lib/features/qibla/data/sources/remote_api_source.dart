@@ -1,13 +1,11 @@
-// currently it is not used anywhere in code
-
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math'; // Added
+import 'dart:async'; // Added for TimeoutException
 import 'package:http/http.dart' as http;
 import '../../../../core/utils/location_service.dart';
 
 /// Remote API data source for Qibla calculation via external service
-/// Fallback when local calculation is not possible or for validation
-/// API Reference: https://aladhan.com/qibla-calculator
 class RemoteApiSource {
   static const String _baseUrl = 'https://api.aladhan.com/v1';
   static const Duration _timeout = Duration(seconds: 10);
@@ -21,9 +19,6 @@ class RemoteApiSource {
   })  : _httpClient = httpClient ?? http.Client(),
         _isEnabled = isEnabled;
 
-  /// Calculate Qibla direction using Aladhan API
-  /// 
-  /// Returns Qibla data including direction, distance, and metadata
   Future<RemoteQiblaResponse> calculateQibla({
     required double latitude,
     required double longitude,
@@ -63,12 +58,11 @@ class RemoteApiSource {
     }
   }
 
-  /// Get prayer times for location (bonus feature)
   Future<PrayerTimesResponse> getPrayerTimes({
     required double latitude,
     required double longitude,
     required DateTime date,
-    String? method, // e.g., 'ISNA', 'MWL', 'UmmAlQura'
+    String? method,
   }) async {
     if (!_isEnabled) {
       throw RemoteDataSourceException('Remote API is disabled');
@@ -97,12 +91,10 @@ class RemoteApiSource {
     }
   }
 
-  /// Validate coordinates via reverse geocoding
   Future<LocationInfo> reverseGeocode({
     required double latitude,
     required double longitude,
   }) async {
-    // Using Aladhan's hijri API which returns location info
     try {
       final uri = Uri.parse('$_baseUrl/hijri').replace(queryParameters: {
         'latitude': latitude.toString(),
@@ -122,17 +114,15 @@ class RemoteApiSource {
     }
   }
 
-  /// Close the HTTP client (call on app shutdown)
   void dispose() {
     _httpClient.close();
   }
 }
 
-/// Response model for remote Qibla API
 class RemoteQiblaResponse {
-  final double direction; // Degrees from north
-  final String directionString; // Human readable
-  final double distance; // Distance to Kaaba in km
+  final double direction;
+  final String directionString;
+  final double distance;
   final LocationData coordinates;
 
   RemoteQiblaResponse({
@@ -164,34 +154,28 @@ class RemoteQiblaResponse {
     return directions[index];
   }
 
-  /// Approximate distance to Kaaba using Haversine formula
   static double _calculateDistanceToKaaba(double lat, double lon) {
     const kaabaLat = 21.422524;
     const kaabaLon = 39.826189;
-    const earthRadius = 6371; // km
+    const earthRadius = 6371;
 
     final dLat = _toRad(kaabaLat - lat);
     final dLon = _toRad(kaabaLon - lon);
     
-    final a = _sin(dLat/2) * _sin(dLat/2) +
-              _cos(_toRad(lat)) * _cos(_toRad(kaabaLat)) *
-              _sin(dLon/2) * _sin(dLon/2);
+    final a = sin(dLat/2) * sin(dLat/2) +
+              cos(_toRad(lat)) * cos(_toRad(kaabaLat)) *
+              sin(dLon/2) * sin(dLon/2);
     
-    final c = 2 * _atan2(_sqrt(a), _sqrt(1-a));
+    final c = 2 * atan2(sqrt(a), sqrt(1-a));
     return earthRadius * c;
   }
 
-  static double _toRad(double deg) => deg * 3.14159265359 / 180;
-  static double _sin(double x) => x.sin;
-  static double _cos(double x) => x.cos;
-  static double _atan2(double y, double x) => x.atan2(y);
-  static double _sqrt(double x) => x.sqrt;
+  static double _toRad(double deg) => deg * pi / 180;
 }
 
-/// Response model for prayer times API
 class PrayerTimesResponse {
   final DateTime date;
-  final Map<String, String> timings; // { 'Fajr': '05:23', 'Dhuhr': '12:45', ... }
+  final Map<String, String> timings;
   final String timezone;
   final String method;
 
@@ -216,7 +200,6 @@ class PrayerTimesResponse {
   }
 }
 
-/// Location info from reverse geocoding
 class LocationInfo {
   final String? city;
   final String? country;
@@ -240,7 +223,6 @@ class LocationInfo {
   }
 }
 
-/// Exception class for remote data source errors
 class RemoteDataSourceException implements Exception {
   final String message;
   final dynamic error;

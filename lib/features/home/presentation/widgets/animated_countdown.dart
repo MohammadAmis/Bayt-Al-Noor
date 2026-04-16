@@ -16,12 +16,10 @@ class _AnimatedCountdown extends StatefulWidget {
 
 class _AnimatedCountdownState extends State<_AnimatedCountdown>
     with SingleTickerProviderStateMixin {
-  late Duration _previousDuration;
   
   @override
   void initState() {
     super.initState();
-    _previousDuration = widget.duration;
   }
   
   @override
@@ -31,7 +29,6 @@ class _AnimatedCountdownState extends State<_AnimatedCountdown>
       // Trigger subtle scale animation on change
       _triggerUpdateAnimation();
     }
-    _previousDuration = widget.duration;
   }
   
   void _triggerUpdateAnimation() {
@@ -197,36 +194,6 @@ class _PrayerTimeBadge extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _CountdownSkeleton extends StatelessWidget {
-  const _CountdownSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Container(
-            width: 50,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha:0.1),
-              borderRadius: AppShapes.lgRadius,
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
-              ),
-            ),
-          ),
-        );
-      }),
     );
   }
 }

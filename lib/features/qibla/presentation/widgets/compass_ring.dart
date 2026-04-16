@@ -60,21 +60,21 @@ class CompassRing extends StatelessWidget {
 
   /// N/E/S/W labels positioned around compass
   Widget _buildCardinalLabels() {
-    return Stack(
+    return const Stack(
       children: [
-        const Positioned(
+        Positioned(
           top: 30,
           child: _DirectionLabel(text: 'N', isHighlighted: true),
         ),
-        const Positioned(
+        Positioned(
           right: 30,
           child: _DirectionLabel(text: 'E'),
         ),
-        const Positioned(
+        Positioned(
           bottom: 30,
           child: _DirectionLabel(text: 'S'),
         ),
-        const Positioned(
+        Positioned(
           left: 30,
           child: _DirectionLabel(text: 'W'),
         ),

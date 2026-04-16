@@ -71,9 +71,9 @@ class _TasbihPageState extends State<TasbihPage>
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
-        title: 'Bayt Al-Noor',
-        subtitle: 'بَيْتُ النُّورِ',
-        location: 'London, UK',
+        title: 'Tasbih',
+        isMainScreen: true,
+        location: 'Tasbih',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,

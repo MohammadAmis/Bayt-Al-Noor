@@ -3,8 +3,7 @@ import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../profile/presentation/pages/public_profile_page.dart';
-import 'community_chat_page.dart';
-import 'private_chat_page.dart';
+import 'chat_page.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -21,9 +20,9 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
-        title: 'Bayt Al-Noor',
-        subtitle: 'بَيْتُ النُّورِ',
-        location: 'London, UK',
+        title: 'Community',
+        isMainScreen: true,
+        location: 'Community',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,
@@ -294,12 +293,26 @@ class _ChatItem extends StatelessWidget {
         if (title == 'Amir Al-Hussein') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const PrivateChatPage()),
+            MaterialPageRoute(
+              builder: (context) => const ChatPage(
+                type: ChatType.private,
+                title: 'Amir Al-Hussein',
+                subtitle: 'ACTIVE NOW',
+                avatarUrl:
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBCJK2wMGg9gMZiUvgQIGnRElk5TNAbyKemys1O17W0kXuyhkl5XylevUyfHrTa9Hop7ubE0lFzqujFUp-j_ZYjFAON2i72aSzYlVsv6h3TvC0D2Ft7KsWAwB8zGVZkE5mWCPcNtirz2RUxCbbbSVxXqirYVkoLN3CIPW-sK6jShiDfrDvRVpFGp9Wjf3IZ_jfBIGsQQCqIGgP5M7JPxAoJ8fxmeiM7Do8heijs_p03yjZw2Vu9gEgK2PlhDPEi-khNkk6FpnaG9Kw',
+              ),
+            ),
           );
         } else {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CommunityChatPage()),
+            MaterialPageRoute(
+              builder: (context) => const ChatPage(
+                type: ChatType.community,
+                title: 'Sacred Rhythm',
+                subtitle: 'COMMUNITY CIRCLE',
+              ),
+            ),
           );
         }
       },

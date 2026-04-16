@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan/adhan.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/design_tokens.dart';
-import '../../../../core/providers/hijri_date_provider.dart';
+import '../../../settings/providers/settings_providers.dart';
 
 class PrayerStatusCard extends ConsumerWidget {
   final String nextPrayerName;
@@ -25,9 +25,17 @@ class PrayerStatusCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final countdownAsync = ref.watch(countdownStreamProvider(nextPrayer));
-    final hijriDate = ref.watch(hijriPrayerDateProvider(prayerTime));
     final isPrayerTime = countdownAsync.value?.inSeconds == 0;
     final timeStr = DateFormat('h:mm a').format(prayerTime);
+
+    // Notification State Sync
+    final globalEnabled = ref.watch(notificationsEnabledProvider);
+    final prayerEnabled =
+        ref.watch(prayerNotificationsProvider(nextPrayerName.toLowerCase()));
+    final isEffectivelyEnabled = globalEnabled && prayerEnabled;
+
+    final prayerBaseColor = AppColors.getPrayerBaseColor(nextPrayerName);
+    final prayerShadow = AppColors.getPrayerShadow(nextPrayerName, isLarge: false);
 
     return Semantics(
       label: 'Next prayer: $nextPrayerName in ${_formatCountdownForSemantics(countdownAsync.value)}',
@@ -37,151 +45,236 @@ class PrayerStatusCard extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: AppShapes.xlRadius,
-          splashColor: Colors.white.withValues(alpha: 0.08),
+          borderRadius: AppShapes.lgRadius,
           child: AnimatedContainer(
             duration: AppAnimations.normal,
             decoration: BoxDecoration(
-              gradient: isPrayerTime
-                  ? const LinearGradient(
-                      colors: [Color(0xFF1B6B52), Color(0xFF0D3D2E)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : const LinearGradient(
-                      colors: [Color(0xFF00342B), Color(0xFF004D40)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-              borderRadius: AppShapes.xlRadius,
+              color: prayerBaseColor,
+              borderRadius: AppShapes.lgRadius,
               boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF00342B).withValues(alpha: isPrayerTime ? 0.45 : 0.28),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
+                prayerShadow.copyWith(
+                  color: prayerShadow.color.withValues(alpha: isPrayerTime ? 0.3 : 0.15),
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // ── Main body: left info / right countdown ──
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 16, 16, 12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // ── LEFT: label + name + prayer time ──
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // "Next Prayer" pill + alert icon
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.14),
-                                    borderRadius: AppShapes.fullRadius,
+            child: ClipRRect(
+              borderRadius: AppShapes.lgRadius,
+              child: Stack(
+                children: [
+                  // Subtle Pattern
+                  Positioned(
+                    right: -10,
+                    top: -10,
+                    child: Opacity(
+                      opacity: 0.1,
+                      child: Icon(
+                        _getIcon(nextPrayerName),
+                        size: 80,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+
+                  
+                  // Main Content
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Left: Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    nextPrayerName,
+                                    style: AppTypography.display.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.5,
+                                    ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        isPrayerTime ? Icons.star_rounded : Icons.mosque_rounded,
-                                        size: 10,
-                                        color: Colors.white.withValues(alpha: 0.9),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.25),
+                                      borderRadius: AppShapes.smRadius,
+                                    ),
+                                    child: const Text(
+                                      'UPCOMING',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        isPrayerTime ? 'Prayer Time!' : 'Next Prayer',
-                                        style: AppTypography.label.copyWith(
-                                          color: Colors.white.withValues(alpha: 0.9),
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.4,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (showNotificationToggle) ...[
-                                  const SizedBox(width: 6),
-                                  Icon(
-                                    Icons.notifications_active_rounded,
-                                    size: 13,
-                                    color: Colors.white.withValues(alpha: 0.55),
+                                    ),
                                   ),
                                 ],
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            // Prayer name
-                            Text(
-                              nextPrayerName,
-                              style: AppTypography.headline.copyWith(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w700,
-                                height: 1.0,
                               ),
                             ),
-                            // Arabic name
-                            if (_getArabicName(nextPrayer) != null) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                _getArabicName(nextPrayer)!,
-                                style: AppTypography.headline.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 10),
-                            // Prayer clock time
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.schedule_rounded,
-                                  size: 13,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  timeStr,
-                                  style: AppTypography.label.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                              const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.access_time_filled_rounded, size: 12, color: Colors.white.withValues(alpha: 0.6)),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        timeStr,
+                                        style: AppTypography.label.copyWith(
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      if (showNotificationToggle) ...[
+                                        const SizedBox(width: 12),
+                                        Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            onTap: () {
+                                              if (!globalEnabled) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        'Global notifications are turned off in settings.'),
+                                                    duration: Duration(seconds: 2),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              ref
+                                                  .read(prayerNotificationsProvider(
+                                                          nextPrayerName.toLowerCase())
+                                                      .notifier)
+                                                  .toggle(!prayerEnabled);
+                                            },
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: isEffectivelyEnabled
+                                                    ? Colors.white.withValues(alpha: 0.15)
+                                                    : Colors.transparent,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: isEffectivelyEnabled
+                                                      ? Colors.white.withValues(alpha: 0.3)
+                                                      : Colors.white.withValues(alpha: 0.1),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: AnimatedSwitcher(
+                                                duration: const Duration(milliseconds: 300),
+                                                child: Icon(
+                                                  isEffectivelyEnabled
+                                                      ? Icons.notifications_active_rounded
+                                                      : Icons.notifications_off_outlined,
+                                                  key: ValueKey(isEffectivelyEnabled),
+                                                  color: isEffectivelyEnabled
+                                                      ? Colors.white
+                                                      : Colors.white.withValues(alpha: 0.5),
+                                                  size: 14,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-
-                      // ── RIGHT: countdown ──
-                      countdownAsync.when(
-                        data: (duration) => _buildCountdown(duration, isPrayerTime),
-                        loading: _buildCountdownSkeleton,
-                        error: (_, __) => _buildCountdownError(),
-                      ),
-                    ],
+                        
+                        // Right: Countdown
+                        countdownAsync.when(
+                          data: (duration) => _buildCompactCountdown(duration, isPrayerTime),
+                          loading: () => const SizedBox(width: 60, height: 40),
+                          error: (_, __) => const Icon(Icons.error_outline, color: Colors.white54),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-
-
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildCompactCountdown(Duration duration, bool isPrayerTime) {
+    if (isPrayerTime) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          borderRadius: AppShapes.defaultRadius,
+          border: Border.all(color: Colors.white24),
+        ),
+        child: const Text(
+          'NOW',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12),
+        ),
+      );
+    }
+
+    final h = duration.inHours;
+    final m = duration.inMinutes.remainder(60);
+    final s = duration.inSeconds.remainder(60);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: AppShapes.defaultRadius,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}',
+            style: AppTypography.display.copyWith(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'REMAINING',
+            style: AppTypography.label.copyWith(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _getIcon(String prayerName) {
+    final name = prayerName.toLowerCase();
+    if (name.contains('fajr')) return Icons.nights_stay_rounded;
+    if (name.contains('sunrise')) return Icons.wb_sunny_rounded;
+    if (name.contains('dhuhr')) return Icons.wb_sunny_rounded;
+    if (name.contains('asr')) return Icons.wb_cloudy_rounded;
+    if (name.contains('maghrib')) return Icons.wb_twilight_rounded;
+    if (name.contains('isha')) return Icons.nights_stay_rounded;
+    return Icons.mosque_rounded;
   }
 
   // ── Countdown: "prayer time now" state ──
@@ -191,7 +284,8 @@ class PrayerStatusCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: AppShapes.lgRadius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -227,7 +321,8 @@ class PrayerStatusCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: AppShapes.lgRadius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -343,13 +438,20 @@ class PrayerStatusCard extends ConsumerWidget {
 
   String? _getArabicName(Prayer prayer) {
     switch (prayer) {
-      case Prayer.fajr:     return 'الفجر';
-      case Prayer.sunrise:  return 'الشروق';
-      case Prayer.dhuhr:    return 'الظهر';
-      case Prayer.asr:      return 'العصر';
-      case Prayer.maghrib:  return 'المغرب';
-      case Prayer.isha:     return 'العشاء';
-      default:              return null;
+      case Prayer.fajr:
+        return 'الفجر';
+      case Prayer.sunrise:
+        return 'الشروق';
+      case Prayer.dhuhr:
+        return 'الظهر';
+      case Prayer.asr:
+        return 'العصر';
+      case Prayer.maghrib:
+        return 'المغرب';
+      case Prayer.isha:
+        return 'العشاء';
+      default:
+        return null;
     }
   }
 

@@ -48,34 +48,38 @@ class ActivePrayerWindow extends Equatable {
       );
     }
     
-    // 🌅 Ishraq/Zawal logic (Sunrise window)
+    // 🌅 Unified Ishraq/Chasht (Duha) logic
     if (currentPrayer == Prayer.sunrise) {
       final sunrise = prayerTimes.sunrise;
-      final ishraq = sunrise.add(const Duration(minutes: 15)); // Approximate
-      final zawal = prayerTimes.dhuhr.subtract(const Duration(minutes: 5));
+      final dhuhr = prayerTimes.dhuhr;
       
-      if (now.isBefore(ishraq)) {
+      final restrictionEnd = sunrise.add(const Duration(minutes: 20)); // Hanafi buffer
+      final zawalStart = dhuhr.subtract(const Duration(minutes: 15)); // Zawal buffer
+      
+      if (now.isBefore(restrictionEnd)) {
         return ActivePrayerWindow(
           displayName: 'Sunrise',
           startTime: sunrise,
-          endTime: ishraq,
-          windowType: SpiritualWindow.none,
+          endTime: restrictionEnd,
+          windowType: SpiritualWindow.none, // Restricted
           isCurrent: true,
         );
       }
-      if (now.isBefore(zawal)) {
+      
+      if (now.isBefore(zawalStart)) {
         return ActivePrayerWindow(
-          displayName: 'Ishraq',
-          startTime: ishraq,
-          endTime: zawal,
+          displayName: 'Duha',
+          startTime: restrictionEnd,
+          endTime: zawalStart,
           windowType: SpiritualWindow.ishraq,
           isCurrent: true,
         );
       }
+      
       return ActivePrayerWindow(
-        displayName: 'Zawal',
-        startTime: zawal,
-        endTime: prayerTimes.dhuhr,
+        displayName: 'Zawal (Makruh)',
+        startTime: zawalStart,
+        endTime: dhuhr,
         windowType: SpiritualWindow.zawal,
         isCurrent: true,
       );

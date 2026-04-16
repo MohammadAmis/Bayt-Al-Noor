@@ -172,8 +172,10 @@ class LocationManager extends StateNotifier<AsyncValue<AppLocation?>> {
     
     // Get position with reasonable accuracy vs battery tradeoff
     final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
-      timeLimit: const Duration(seconds: 15),
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.medium,
+        timeLimit: Duration(seconds: 15),
+      ),
     );
     
     // Reverse geocode for address (optional, non-blocking)

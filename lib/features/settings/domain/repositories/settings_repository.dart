@@ -23,6 +23,9 @@ abstract class SettingsRepository {
   
   Future<bool> getIsHanafi();
   Future<void> setIsHanafi(bool isHanafi);
+
+  Future<bool> getPrayerNotificationEnabled(String prayerName);
+  Future<void> setPrayerNotificationEnabled(String prayerName, bool enabled);
   
   Future<void> clearAll();
 }
@@ -124,6 +127,21 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
     await prefs.setBool('${_prefix}is_hanafi', isHanafi);
   }
   
+  @override
+  Future<bool> getPrayerNotificationEnabled(String prayerName) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Default to true for all except sunrise, ishraq, and chast
+    final name = prayerName.toLowerCase();
+    final defaultValue = !(name == 'sunrise' || name == 'ishraq' || name == 'chast');
+    return prefs.getBool('${_prefix}prayer_notify_$prayerName') ?? defaultValue;
+  }
+
+  @override
+  Future<void> setPrayerNotificationEnabled(String prayerName, bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('${_prefix}prayer_notify_$prayerName', enabled);
+  }
+
   @override
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();

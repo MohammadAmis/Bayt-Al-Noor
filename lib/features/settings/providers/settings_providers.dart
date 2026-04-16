@@ -161,3 +161,40 @@ class IsHanafiNotifier extends StateNotifier<bool> {
     state = isHanafi;
   }
 }
+
+/// ✅ Per-prayer notification settings
+final prayerNotificationsProvider = StateNotifierProvider.family<PrayerNotificationNotifier, bool, String>((ref, prayerName) {
+  return PrayerNotificationNotifier(ref.read(settingsRepositoryProvider), prayerName);
+});
+
+class PrayerNotificationNotifier extends StateNotifier<bool> {
+  final SettingsRepository _repo;
+  final String _prayerName;
+  
+  PrayerNotificationNotifier(this._repo, this._prayerName) : super(true) {
+    _load();
+  }
+  
+  Future<void> _load() async {
+    state = await _repo.getPrayerNotificationEnabled(_prayerName);
+  }
+  
+  Future<void> toggle(bool enabled) async {
+    await _repo.setPrayerNotificationEnabled(_prayerName, enabled);
+    state = enabled;
+  }
+}
+
+/// ✅ Provider that watches all prayer notifications
+final allPrayerNotificationsProvider = Provider<Map<String, bool>>((ref) {
+  return {
+    'fajr': ref.watch(prayerNotificationsProvider('fajr')),
+    'sunrise': ref.watch(prayerNotificationsProvider('sunrise')),
+    'ishraq': ref.watch(prayerNotificationsProvider('ishraq')),
+    'chast': ref.watch(prayerNotificationsProvider('chast')),
+    'dhuhr': ref.watch(prayerNotificationsProvider('dhuhr')),
+    'asr': ref.watch(prayerNotificationsProvider('asr')),
+    'maghrib': ref.watch(prayerNotificationsProvider('maghrib')),
+    'isha': ref.watch(prayerNotificationsProvider('isha')),
+  };
+});

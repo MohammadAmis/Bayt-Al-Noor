@@ -23,176 +23,171 @@ class CurrentPrayerHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hijriDate = ref.watch(hijriDateDisplayProvider);
-    return Stack(
-      children: [
-        if (windowType == SpiritualWindow.ishraq)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.radialHighlight,
-                borderRadius: AppShapes.xlRadius,
+    final baseColor = AppColors.getPrayerBaseColor(prayerName);
+    final shadow = AppColors.getPrayerShadow(prayerName, isLarge: true);
+    final bgIcon = _getBgIcon(prayerName);
+
+    return AnimatedContainer(
+      duration: AppAnimations.normal,
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: baseColor,
+        borderRadius: AppShapes.xlRadius,
+        boxShadow: [shadow],
+      ),
+      child: ClipRRect(
+        borderRadius: AppShapes.xlRadius,
+        child: Stack(
+          children: [
+            // Immersive Background Icon
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Opacity(
+                opacity: 0.12,
+                child: Icon(
+                  bgIcon,
+                  size: 160,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-        AnimatedContainer(
-          duration: AppAnimations.normal,
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: _getGradientForWindow(windowType),
-            borderRadius: AppShapes.xlRadius,
-            boxShadow: windowType != SpiritualWindow.regular
-                ? [
-                    BoxShadow(
-                        color: AppColors.surfaceTint.withValues(alpha: 0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4))
-                  ]
-                : null,
-          ),
-          child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                        Row(
+            
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              date.toUpperCase(),
-                              style: AppTypography.label.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
+                            // Date & Hijri
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: AppShapes.defaultRadius,
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      date.toUpperCase(),
+                                      style: AppTypography.label.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    if (hijriDate != null) ...[
+                                      const SizedBox(width: 8),
+                                      Container(width: 1, height: 10, color: Colors.white24),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        hijriDate.toUpperCase(),
+                                        style: AppTypography.label.copyWith(
+                                          color: Colors.white.withValues(alpha: 0.7),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             ),
-                            if (hijriDate != null) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white24,
-                                  shape: BoxShape.circle,
-                                ),
+                            const SizedBox(height: 16),
+                            // Prayer Name
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    prayerName,
+                                    style: AppTypography.display.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.25),
+                                      borderRadius: AppShapes.smRadius,
+                                    ),
+                                    child: const Text(
+                                      'CURRENT',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                hijriDate.toUpperCase(),
-                                style: AppTypography.label.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                            ),
                           ],
                         ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              prayerName,
-                              style: AppTypography.display.copyWith(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      ),
+                      
+                      // Time Display
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            time,
+                            style: AppTypography.display.copyWith(
+                              color: Colors.white,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha:0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            'CURRENT',
+                          Text(
+                            amPm,
                             style: AppTypography.label.copyWith(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Flexible(
-                flex: 0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      time,
-                      style: AppTypography.display.copyWith(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
+                        ],
                       ),
-                    ),
-                    Text(
-                      amPm,
-                      style: AppTypography.label.copyWith(
-                        color: Colors.white.withValues(alpha:0.6),
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (windowType != SpiritualWindow.regular && windowType != SpiritualWindow.none)
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: AppShapes.fullRadius,
-                ),
-                child: Text(
-                  windowType == SpiritualWindow.ishraq ? '✨ Ishraq Time' : '⚠️ Zawal (Makruh)',
-                  style: AppTypography.label.copyWith(color: Colors.white),
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
-        ],
+          ],
+        ),
       ),
-    ),
-    ],
     );
   }
 
-  LinearGradient _getGradientForWindow(SpiritualWindow type) {
-    switch (type) {
-      case SpiritualWindow.ishraq:
-        return const LinearGradient(colors: [Color(0xFFFFB74D), Color(0xFFFF9800)]);
-      case SpiritualWindow.zawal:
-        return const LinearGradient(colors: [Color(0xFF9E9E9E), Color(0xFF616161)]);
-      default:
-        // Use default primary color if no gradient is specified
-        return const LinearGradient(colors: [AppColors.primary, AppColors.primary]);
-    }
+  IconData _getBgIcon(String prayerName) {
+    final name = prayerName.toLowerCase();
+    if (name.contains('fajr')) return Icons.nights_stay_rounded;
+    if (name.contains('sunrise')) return Icons.wb_sunny_rounded;
+    if (name.contains('ishraq') || name.contains('chast')) return Icons.wb_twilight_rounded;
+    if (name.contains('dhuhr')) return Icons.wb_sunny_rounded;
+    if (name.contains('asr')) return Icons.wb_cloudy_rounded;
+    if (name.contains('maghrib')) return Icons.wb_twilight_rounded;
+    if (name.contains('isha')) return Icons.nights_stay_rounded;
+    return Icons.mosque_rounded;
   }
 }

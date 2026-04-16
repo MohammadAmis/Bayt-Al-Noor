@@ -471,7 +471,7 @@ class _LocationInfoCard extends StatelessWidget {
           Container(
             width: 50,
             height: 50,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primaryContainer,
               shape: BoxShape.circle,
             ),
@@ -496,7 +496,7 @@ class _LocationInfoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${direction.formatted}',
+                  direction.formatted,
                   style: AppTypography.headline.copyWith(
                     fontSize: 20,
                     color: AppColors.primary,
@@ -505,7 +505,7 @@ class _LocationInfoCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Calculated at ${_formatTime(direction.calculatedAt)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.outlineVariant,
                   ),

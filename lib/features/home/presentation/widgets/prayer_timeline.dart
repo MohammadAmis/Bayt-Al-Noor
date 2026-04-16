@@ -51,7 +51,7 @@ class _PrayerTimelineState extends State<PrayerTimeline>
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.secondaryFixed
-                        .withValues(alpha:0.15 * _animation.value),
+                        .withValues(alpha: 0.15 * _animation.value),
                     blurRadius: 60 * _animation.value,
                     spreadRadius: 10 * _animation.value,
                   ),
@@ -68,9 +68,10 @@ class _PrayerTimelineState extends State<PrayerTimeline>
                   height: 280,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.surfaceContainerLowest.withValues(alpha:0.75),
+                    color: AppColors.surfaceContainerLowest
+                        .withValues(alpha: 0.75),
                     border: Border.all(
-                      color: AppColors.outlineVariant.withValues(alpha:0.2),
+                      color: AppColors.outlineVariant.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -125,14 +126,14 @@ class TimelinePainter extends CustomPainter {
 
     // Draw the subtle background ring
     final bgRingPaint = Paint()
-      ..color = AppColors.outlineVariant.withValues(alpha:0.1)
+      ..color = AppColors.outlineVariant.withValues(alpha: 0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
     canvas.drawCircle(center, radius - 10, bgRingPaint);
 
     // Draw the 5 prayer points on the circle
     final paintPointOff = Paint()
-      ..color = AppColors.primary.withValues(alpha:0.15)
+      ..color = AppColors.primary.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
     const prayerTimes = [
@@ -182,7 +183,7 @@ class TimelinePainter extends CustomPainter {
     canvas.drawCircle(dotOffset, 6, indicatorPaint);
 
     final glowPaint = Paint()
-      ..color = AppColors.secondary.withValues(alpha:0.4)
+      ..color = AppColors.secondary.withValues(alpha: 0.4)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8 * pulseValue);
     canvas.drawCircle(dotOffset, 14 * pulseValue, glowPaint);
   }

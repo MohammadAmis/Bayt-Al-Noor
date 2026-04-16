@@ -56,6 +56,8 @@ dependencies:
   timezone: ^0.9.2
   equatable: ^2.0.5
   permission_handler: ^12.0.1
+  rxdart: ^0.28.0
+  url_launcher: ^6.3.0
   rxdata: ^0.8.0
 
 dev_dependencies:
@@ -84,6 +86,7 @@ flutter:
   assets:
     - assets/reflection_verse.png
     - assets/logo_kufic.png
+    - assets/logo_2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -50,7 +50,7 @@ class _LocationInputDialogState extends ConsumerState<LocationInputDialog> {
             controller: _controller,
             decoration: InputDecoration(
               hintText: 'Location name or coordinates',
-              hintStyle: AppTypography.body.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
+              hintStyle: AppTypography.body.copyWith(color: AppColors.onSurfaceVariant.withValues(alpha: 0.5)),
               filled: true,
               fillColor: AppColors.surfaceContainerLowest,
               border: OutlineInputBorder(borderRadius: AppShapes.lgRadius, borderSide: BorderSide.none),

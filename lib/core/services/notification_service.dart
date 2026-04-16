@@ -111,21 +111,20 @@ class NotificationService {
     required PrayerTimes prayerTimes,
     required int offsetMinutes,
     required bool enableSound,
+    required Map<String, bool> enabledPrayers,
   }) async {
     if (kIsWeb) return;
-    if (!enableSound && false) { // Placeholder for absolute disable logic if needed, but we use the flag directly now
-      await cancelAll();
-      return;
-    }
     
     await initialize();
     
     // Cancel existing to avoid duplicates
     await cancelAll();
     
-    final now = DateTime.now();
     final prayers = [
       (Prayer.fajr, prayerTimes.fajr, 'Fajr', 'الفجر'),
+      (Prayer.sunrise, prayerTimes.sunrise, 'Sunrise', 'الشروق'),
+      (null, prayerTimes.sunrise.add(const Duration(minutes: 15)), 'Ishraq', 'الإشراق'),
+      (null, prayerTimes.sunrise.add(const Duration(minutes: 25)), 'Chast', 'الضحى'),
       (Prayer.dhuhr, prayerTimes.dhuhr, 'Dhuhr', 'الظهر'),
       (Prayer.asr, prayerTimes.asr, 'Asr', 'العصر'),
       (Prayer.maghrib, prayerTimes.maghrib, 'Maghrib', 'المغرب'),
@@ -133,6 +132,12 @@ class NotificationService {
     ];
     
     for (final (_, time, name, arabic) in prayers) {
+      final isEnabled = enabledPrayers[name.toLowerCase()] ?? true;
+      if (!isEnabled) {
+        debugPrint('⏭️ Skipping notification for $name (disabled by user)');
+        continue;
+      }
+
       final prayerLocal = tz.TZDateTime.from(time, tz.local);
       final alertTime = prayerLocal.subtract(Duration(minutes: offsetMinutes));
       

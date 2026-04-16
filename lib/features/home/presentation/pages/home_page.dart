@@ -4,7 +4,6 @@ import 'package:adhan/adhan.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../widgets/prayer_status_card.dart';
-import '../widgets/prayer_details_dialog.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../widgets/milestone_grid.dart';
 import '../widgets/real_time_prayer_clock.dart';
@@ -126,7 +125,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           backgroundColor: AppColors.surface,
           appBar: AppTopBar(
             title: 'Bayt Al-Noor',
-            subtitle: isHanafi ? 'Hanafi Method' : 'بَيْتُ النُّورِ',
+            isMainScreen: true,
             location: locationAsync.maybeWhen(
               data: (loc) => loc?.displayAddress ?? 'Unknown',
               orElse: () => data.cityName.toUpperCase(),
@@ -193,14 +192,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                           nextPrayer: nextPrayer,
                           prayerTime: data.prayerTimes.timeForPrayer(nextPrayer) ?? DateTime.now(),
                           showNotificationToggle: true,
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (_) => PrayerDetailsDialog(
-                              prayerName: upcomingPrayerName,
-                              prayerTime: data.prayerTimes.timeForPrayer(nextPrayer) ?? DateTime.now(),
-                              prayer: nextPrayer,
-                            ),
-                          ),
                         ),
 
                         const SizedBox(height: 16),

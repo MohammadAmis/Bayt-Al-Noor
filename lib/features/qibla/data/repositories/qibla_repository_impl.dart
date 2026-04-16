@@ -7,10 +7,9 @@ import 'dart:convert';
 
 /// Concrete implementation with caching via SharedPreferences
 class QiblaRepositoryImpl implements QiblaRepository {
-  final LocationService _locationService;
   static const String _cacheKey = 'qibla_cache_v1';
 
-  QiblaRepositoryImpl(this._locationService);
+  QiblaRepositoryImpl();
 
   @override
   Future<QiblaDirection> calculateQibla({

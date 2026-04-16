@@ -88,6 +88,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
   final String location;
+  final bool isMainScreen;
   final VoidCallback? onMenuPressed;
   final VoidCallback? onSettingsPressed;
   final VoidCallback? onProfilePressed;
@@ -99,6 +100,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.subtitle,
     required this.location,
+    this.isMainScreen = false,
     this.onMenuPressed,
     this.onSettingsPressed,
     this.onProfilePressed,
@@ -108,122 +110,124 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
-      blur: 20,
-      borderRadius: BorderRadius.zero,
-      color: AppColors.surfaceContainerLow.withValues(alpha: 0.9),
-      border: Border(
-        bottom: BorderSide(
-          color: AppColors.outlineVariant.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
+    return Container(
+      color: AppColors.surface,
       child: SafeArea(
         child: Container(
-          height: 84,
+          height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left Section: Profile Avatar OR Back Button
-              SizedBox(
-                width: 48,
-                child: (onProfilePressed != null && leadingIcon == null)
-                    ? GestureDetector(
-                        onTap: onProfilePressed,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                width: 1.5),
-                          ),
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundImage: NetworkImage(profileImageUrl ??
-                                'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y'),
-                          ),
-                        ),
-                      )
-                    : (Navigator.canPop(context) || leadingIcon != null)
-                        ? IconButton(
-                            onPressed: onMenuPressed ??
-                                () => Navigator.maybePop(context),
-                            icon: Icon(leadingIcon ?? Icons.arrow_back,
-                                color: AppColors.primary),
-                          )
-                        : const SizedBox.shrink(),
-              ),
-
-              // Middle Section: Centered Title & Location
+              // Left Section
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Row(
                   children: [
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: title,
-                            style: AppTypography.display.copyWith(
-                              color: AppColors.primaryContainer,
-                              fontSize: 18,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (subtitle != null)
-                            TextSpan(
-                              text: ' ($subtitle)',
-                              style: const TextStyle(
-                                fontFamily: 'Noto Serif',
-                                color: AppColors.primaryContainer,
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                        ],
+                    if (!isMainScreen) ...[
+                      IconButton(
+                        onPressed: onMenuPressed ??
+                            () => Navigator.maybePop(context),
+                        icon: Icon(leadingIcon ?? Icons.arrow_back_rounded,
+                            color: AppColors.primary, size: 24),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    
+                    // Kufic Logo Emblem
+                    // Image.asset(
+                    //   'assets/logo_2.png',
+                    //   height: 32,
+                    //   fit: BoxFit.contain,
+                    // ),
+                    Text(
+                      'بيت النور',
+                      style: AppTypography.headline.copyWith(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_on,
-                            size: 12, color: AppColors.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          location.toUpperCase(),
-                          style: AppTypography.label.copyWith(
-                            color: AppColors.primary.withValues(alpha: 0.6),
-                            fontSize: 10,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.bold,
+                    
+                    const SizedBox(width: 12),
+                    
+                    // Context (Location OR Screen Name)
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 1,
+                            height: 16,
+                            color: AppColors.primary.withValues(alpha: 0.15),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                if (isMainScreen) ...[
+                                  const Icon(Icons.location_on_rounded,
+                                      size: 14, color: AppColors.primary),
+                                  const SizedBox(width: 4),
+                                ],
+                                Expanded(
+                                  child: Text(
+                                    (isMainScreen ? location : title).toUpperCase(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.label.copyWith(
+                                      color: AppColors.primary.withValues(alpha: 0.6),
+                                      fontSize: 11,
+                                      letterSpacing: 1.2,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
 
-              // Right Section: Search & Optional Actions
+              // Right Section
               Row(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
+                
                 children: [
                   if (onSettingsPressed != null)
                     IconButton(
                       onPressed: onSettingsPressed,
                       icon: const Icon(Icons.settings_outlined,
-                          size: 22, color: AppColors.primary),
+                          size: 24, color: AppColors.primary),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
-                  if (onSettingsPressed == null &&
-                      onProfilePressed != null &&
-                      Navigator.canPop(context))
-                    // If we are nested, we can still show a small profile button or keep it clean
-                    const SizedBox(width: 40),
+                    const SizedBox(width: 16),
+                  if (isMainScreen && onProfilePressed != null) ...[
+                    GestureDetector(
+                      onTap: onProfilePressed,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              width: 1),
+                        ),
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundImage: NetworkImage(profileImageUrl ??
+                              'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y'),
+                        ),
+                      ),
+                    ),
+                    // const SizedBox(width: 8),
+                  ],
+                  
                 ],
               ),
             ],
@@ -234,5 +238,5 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(120);
+  Size get preferredSize => const Size.fromHeight(100);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import 'quran_reading_page.dart';
+import 'zakat_calculator_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 
 class DeenHubPage extends StatelessWidget {
@@ -12,9 +13,9 @@ class DeenHubPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
-        title: 'Bayt Al-Noor',
-        subtitle: 'بَيْتُ النُّورِ',
-        location: 'London, UK',
+        title: 'Deen Hub',
+        isMainScreen: true,
+        location: 'Deen Hub',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,
@@ -32,21 +33,16 @@ class DeenHubPage extends StatelessWidget {
         physics: BouncingScrollPhysics(),
         padding: EdgeInsets.only(bottom: 120),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
               child: _DeenSearchBar(),
             ),
-            SizedBox(height: 32),
-            _FeaturedHero(),
-            SizedBox(height: 40),
-            _ContinueJourney(),
-            SizedBox(height: 40),
+            SizedBox(height: 16),
             _EssentialPillars(),
-            SizedBox(height: 40),
+            SizedBox(height: 16),
             _DailyInsightsBento(),
-            SizedBox(height: 40),
+            SizedBox(height: 16),
             _RecentlyViewed(),
           ],
         ),
@@ -60,127 +56,55 @@ class _DeenSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      height: 56,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: AppColors.outline, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Quran, Hadith, or Duas...',
-                hintStyle: AppTypography.body.copyWith(
-                  color: AppColors.outline,
-                  fontSize: 14,
-                ),
-                border: InputBorder.none,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeaturedHero extends StatelessWidget {
-  const _FeaturedHero();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
+    return GlassContainer(
+      blur: 15,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          image: const DecorationImage(
-            image: NetworkImage(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuDb6fvK6ItA3fNqH3mDp-MKEMbWqoRwvJdI5sARJjmCWE_0WbtBiVkh9HeZS5znBUkbJNRxjcjS6YILuaoIrvT_a1R6whNhM8uwiqanVz39XY40R7mnM6VpvAUPe0H4E6Lh5KcpXIvi7y5UxeJCYzUoHN9RoTznhVY7FrDLyk82qeYHcYsCMzY5VRkJT93W8x0NafcBbyKIv41FYRabMdN6gNrH7RbITgpmI2OpCPo7KUnplgyyY6abt6qBqOV9YrlPJ4P2Vc9DKTc'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                AppColors.primary.withValues(alpha: 0.9),
-                AppColors.primary.withValues(alpha: 0.2),
-                Colors.transparent,
-              ],
-            ),
-          ),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryContainer,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Text(
-                  'FEATURED INSIGHT',
-                  style: AppTypography.label.copyWith(
-                    color: AppColors.onSecondaryFixed,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'The Excellence of Ramadan',
-                style: AppTypography.headline.copyWith(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Discover the spiritual depths of the holiest month.',
+      borderRadius: BorderRadius.circular(24),
+      color: AppColors.surfaceContainerLowest.withValues(alpha: 0.4),
+      border: Border.all(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        width: 1,
+      ),
+      child: SizedBox(
+        height: 64,
+        child: Row(
+          children: [
+            const Icon(Icons.search_rounded,
+                color: AppColors.primary, size: 22),
+            const SizedBox(width: 16),
+            Expanded(
+              child: TextField(
                 style: AppTypography.body.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 12,
+                  color: AppColors.onSurface,
+                  fontSize: 15,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search Quran, Hadith, or Duas...',
+                  hintStyle: AppTypography.body.copyWith(
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                    fontSize: 15,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.arrow_forward, size: 14),
-                label: const Text('Read More'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryFixed,
-                  foregroundColor: AppColors.onPrimaryFixed,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                  textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 12),
-                ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
-          ),
+              child: const Icon(Icons.tune_rounded,
+                  color: AppColors.primary, size: 20),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
 
 class _ContinueJourney extends StatelessWidget {
   const _ContinueJourney();
@@ -192,31 +116,32 @@ class _ContinueJourney extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Continue Journey',
-            style: AppTypography.headline.copyWith(
-              fontSize: 18,
-              color: AppColors.primary,
-            ),
+          _SectionHeader(
+            title: 'Continue Journey',
+            onSeeAll: () {},
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(24),
-            ),
+          BentoCard(
+            padding: const EdgeInsets.all(24),
+            color: AppColors.surfaceContainerHigh,
             child: Row(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: AppColors.getPrayerGradient('fajr'),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.fajr.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
-                  child: const Icon(Icons.menu_book,
-                      color: AppColors.primaryFixed, size: 28),
+                  child: const Icon(Icons.auto_stories_rounded,
+                      color: Colors.white, size: 30),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -229,47 +154,71 @@ class _ContinueJourney extends StatelessWidget {
                           Text(
                             'Surah Ar-Rahman',
                             style: AppTypography.title.copyWith(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 17, fontWeight: FontWeight.bold),
                           ),
-                          Text(
-                            '65%',
-                            style: AppTypography.label.copyWith(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '65%',
+                              style: AppTypography.label.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: const LinearProgressIndicator(
-                          value: 0.65,
-                          minHeight: 6,
-                          backgroundColor: AppColors.surfaceContainerHighest,
-                          color: AppColors.primary,
-                        ),
+                      const SizedBox(height: 14),
+                      Stack(
+                        children: [
+                          Container(
+                            height: 8,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          FractionallySizedBox(
+                            widthFactor: 0.65,
+                            child: Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.primary.withValues(alpha: 0.6)
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        AppColors.primary.withValues(alpha: 0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Text(
                         'Last read Ayah 42 • 3 mins ago',
                         style: AppTypography.label.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                          fontSize: 10,
+                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                          fontSize: 11,
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.play_arrow,
-                      color: AppColors.primary, size: 20),
                 ),
               ],
             ),
@@ -290,96 +239,214 @@ class _EssentialPillars extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Essential Pillars',
-            style: AppTypography.headline.copyWith(
-              fontSize: 18,
-              color: AppColors.primary,
-            ),
+          _SectionHeader(
+            title: 'Essential Pillars',
+            onSeeAll: () {},
           ),
-          const SizedBox(height: 20),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.2,
+          const SizedBox(height: 16),
+          // Row 1: Quran (Large) & Hadith
+          Row(
             children: [
-              _buildPillarCard(context, 'Quran', 'Divine scripture',
-                  Icons.auto_stories, AppColors.primary),
-              _buildPillarCard(context, 'Hadith', 'Prophetic traditions',
-                  Icons.history_edu, AppColors.secondary),
-              _buildPillarCard(context, 'Tashbih', 'Dhikr', Icons.fingerprint,
-                  AppColors.onTertiaryContainer),
-              _buildPillarCard(context, 'Dua', 'Islamic',
-                  Icons.waving_hand_rounded, AppColors.onPrimaryColorContainer),
-              _buildPillarCard(context, 'Fatwas', 'Religious rulings',
-                  Icons.gavel, AppColors.secondary),
-              _buildPillarCard(context, 'Books', 'Islamic books', Icons.book,
-                  AppColors.primary),
+              Expanded(
+                flex: 2,
+                child: _PillarCard(
+                  title: 'Quran',
+                  desc: 'Divine Revelation',
+                  icon: Icons.menu_book_rounded,
+                  accentColor: AppColors.primary,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const QuranReadingPage()),
+                  ),
+                  isFeatured: true,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 1,
+                child: _PillarCard(
+                  title: 'Hadith',
+                  desc: 'Prophetic Wisdom',
+                  icon: Icons.history_edu_rounded,
+                  accentColor: AppColors.secondary,
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 2: Dhikr & Dua & Zakat
+          Row(
+            children: [
+              Expanded(
+                child: _PillarCard(
+                  title: 'Dhikr',
+                  desc: 'Remembrance',
+                  icon: Icons.fingerprint_rounded,
+                  accentColor: AppColors.taupe,
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _PillarCard(
+                  title: 'Dua',
+                  desc: 'Supplication',
+                  icon: Icons.volunteer_activism_rounded,
+                  accentColor: AppColors.sand,
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 3: Zakat & Hajj
+          Row(
+            children: [
+              Expanded(
+                child: _PillarCard(
+                  title: 'Zakat',
+                  desc: 'Purification',
+                  icon: Icons.calculate_rounded,
+                  accentColor: AppColors.sage,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ZakatCalculatorPage()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: _PillarCard(
+                  title: 'Hajj Guide',
+                  desc: 'The Holy Journey of Faith',
+                  icon: Icons.mosque_rounded,
+                  accentColor: AppColors.mutedGold,
+                  onTap: () {},
+                  isFeatured: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 4: Books & Fatwas
+          Row(
+            children: [
+              Expanded(
+                child: _PillarCard(
+                  title: 'Library',
+                  desc: 'Knowledge Base',
+                  icon: Icons.library_books_rounded,
+                  accentColor: AppColors.grayGreen,
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _PillarCard(
+                  title: 'Fatwas',
+                  desc: 'Guideline',
+                  icon: Icons.gavel_rounded,
+                  accentColor: AppColors.taupe,
+                  onTap: () {},
+                ),
+              ),
             ],
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPillarCard(BuildContext context, String title, String desc,
-      IconData icon, Color color) {
+class _PillarCard extends StatelessWidget {
+  final String title;
+  final String desc;
+  final IconData icon;
+  final Color accentColor;
+  final VoidCallback onTap;
+  final bool isFeatured;
+
+  const _PillarCard({
+    required this.title,
+    required this.desc,
+    required this.icon,
+    required this.accentColor,
+    required this.onTap,
+    this.isFeatured = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        if (title == 'Quran') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const QuranReadingPage()),
-          );
-        }
-      },
-      // onTap: () {
-      //   if (title == 'Tashbih') {
-      //     Navigator.push(context,
-      //         MaterialPageRoute(builder: (context) => const TasbihPage()));
-      //   }
-      // },
-
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.1)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
+      onTap: onTap,
+      child: BentoCard(
+        padding: EdgeInsets.zero,
+        color: Colors.white,
+        child: ClipRRect(
+          borderRadius: AppShapes.lgRadius,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: isFeatured
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.center,
+              mainAxisAlignment: isFeatured
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    icon,
+                    color: accentColor,
+                    size: isFeatured ? 32 : 24,
+                  ),
+                ),
+                if (!isFeatured) const SizedBox(height: 12),
+                Column(
+                  crossAxisAlignment: isFeatured
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.headline.copyWith(
+                        fontSize: isFeatured ? 18 : 14,
+                        color: AppColors.onSurface,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      desc,
+                      style: AppTypography.label.copyWith(
+                        fontSize: isFeatured ? 11 : 9,
+                        color:
+                            AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: AppTypography.title
-                  .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              desc,
-              textAlign: TextAlign.center,
-              style: AppTypography.label
-                  .copyWith(fontSize: 9, color: AppColors.onSurfaceVariant),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -395,90 +462,103 @@ class _DailyInsightsBento extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          // Daily Ayah
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(32),
-              image: const DecorationImage(
-                image: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDvBS3AAUStiBKU6uJCaz62fCU3Ud2ofcUjHJHhXljbWwXU69McM5aTF98dUVADYumcWMzsElARz-31mN1ApF6hNv-OBqEoArqwy1Td4YbwEuDi2W-E7XyIKRmdH1GP31_tsPK25TShQRKh8S7c4Yq0YWKZ3l77Y6kP2_TWr-gG1eCbzY8ql9p7jRtKJhhjZ9J16DcWnZ8kQA6l4sSd7_qbqNLQZYqgsILJcLuuZzisx5EnSWXrnzpJTxC-qKvtvt4olJXXjemLKeQ'),
-                fit: BoxFit.cover,
-                opacity: 0.05,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          _SectionHeader(title: 'Daily Insights', onSeeAll: () {}),
+          const SizedBox(height: 16),
+          // Ayah Card
+          BentoCard(
+            padding: EdgeInsets.zero,
+            color: AppColors.primary,
+            child: Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(50),
+                Positioned(
+                  top: -20,
+                  right: -20,
+                  child: Icon(
+                    Icons.format_quote_rounded,
+                    size: 150,
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Text(
+                              'DAILY AYAH',
+                              style: AppTypography.label.copyWith(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.bookmark_border_rounded,
+                              color: Colors.white70, size: 22),
+                        ],
                       ),
-                      child: Text(
-                        'DAILY AYAH',
-                        style: AppTypography.label.copyWith(
+                      const SizedBox(height: 32),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ',
+                          style: TextStyle(
+                            fontFamily: 'Amiri',
+                            fontSize: 28,
                             color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5),
+                            height: 1.6,
+                          ),
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                        ),
                       ),
-                    ),
-                    const Icon(Icons.bookmark_outline,
-                        color: AppColors.secondaryFixed, size: 20),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ',
-                    style: TextStyle(
-                      fontFamily: 'Noto Serif',
-                      fontSize: 24,
-                      color: Colors.white,
-                      height: 1.8,
-                    ),
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
+                      const SizedBox(height: 24),
+                      Container(
+                        height: 1,
+                        width: 40,
+                        color: Colors.white30,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '"So remember Me; I will remember you. And be grateful to Me and do not deny Me."',
+                        style: AppTypography.body.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 17,
+                          fontStyle: FontStyle.italic,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Surah Al-Baqarah 2:152',
+                        style: AppTypography.label.copyWith(
+                          color: Colors.white60,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                const Divider(color: Colors.white12),
-                const SizedBox(height: 16),
-                Text(
-                  '"So remember Me; I will remember you. And be grateful to Me and do not deny Me."',
-                  style: AppTypography.body.copyWith(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontStyle: FontStyle.italic,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Surah Al-Baqarah 2:152',
-                  style: AppTypography.label
-                      .copyWith(color: Colors.white60, fontSize: 11),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          // Daily Hadith
-          Container(
+          // Hadith Card
+          BentoCard(
             padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(32),
-            ),
+            color: AppColors.surfaceContainerHighest.withValues(alpha: 0.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -489,48 +569,50 @@ class _DailyInsightsBento extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.secondaryContainer,
+                        color: AppColors.secondary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Text(
                         'DAILY HADITH',
                         style: AppTypography.label.copyWith(
-                            color: AppColors.onSecondaryFixed,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5),
+                          color: AppColors.secondary,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                        ),
                       ),
                     ),
-                    const Icon(Icons.share_outlined,
-                        color: AppColors.primary, size: 18),
+                    const Icon(Icons.share_rounded,
+                        color: AppColors.primary, size: 20),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'الدِّينُ النَّصِيحَةُ',
-                    style: AppTypography.headline.copyWith(
-                        color: AppColors.primary, fontSize: 20, height: 1.8),
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
+                Text(
+                  'الدِّينُ النَّصِيحَةُ',
+                  style: AppTypography.headline.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 22,
+                    height: 1.6,
                   ),
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
                 ),
-                const SizedBox(height: 16),
-                const Divider(color: Colors.black12),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(
                   '"The religion is sincere advice."',
                   style: AppTypography.title.copyWith(
-                      color: AppColors.onSurface,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
+                    color: AppColors.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
-                  'Sahih Muslim',
+                  'Reported by Tamim ad-Dari • Sahih Muslim',
                   style: AppTypography.label.copyWith(
-                      color: AppColors.onSurfaceVariant, fontSize: 11),
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -551,76 +633,100 @@ class _RecentlyViewed extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                'Recently Viewed',
-                style: AppTypography.headline
-                    .copyWith(fontSize: 18, color: AppColors.primary),
-              ),
-              Text(
-                'Clear All',
-                style: AppTypography.label.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12),
-              ),
-            ],
+          _SectionHeader(
+            title: 'Recently Viewed',
+            actionTitle: 'Clear All',
+            onSeeAll: () {},
           ),
           const SizedBox(height: 16),
-          _buildRecentItem('The Importance of Niyyah', 'Article • 2 hours ago',
-              Icons.schedule),
+          _buildRecentItem(
+            'The Importance of Niyyah',
+            'Article • 2 hours ago',
+            Icons.history_rounded,
+          ),
           const SizedBox(height: 12),
           _buildRecentItem(
-              'Surah Al-Kahf', 'Quran • Yesterday', Icons.menu_book),
+            'Surah Al-Kahf',
+            'Quran • Yesterday',
+            Icons.menu_book_rounded,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildRecentItem(String title, String meta, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border:
-            Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.05)),
-      ),
+    return BentoCard(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      color: Colors.white,
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainer,
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.primary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: AppColors.onSurfaceVariant, size: 20),
+            child: Icon(icon, color: AppColors.primary, size: 22),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: AppTypography.title
-                      .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                  style: AppTypography.title.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   meta,
                   style: AppTypography.label.copyWith(
-                      fontSize: 10, color: AppColors.onSurfaceVariant),
+                    fontSize: 11,
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                  ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right,
-              color: AppColors.outlineVariant, size: 18),
+          Icon(Icons.chevron_right_rounded,
+              color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+              size: 20),
         ],
       ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String? actionTitle;
+  final VoidCallback onSeeAll;
+
+  const _SectionHeader({
+    required this.title,
+    this.actionTitle,
+    required this.onSeeAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          title,
+          style: AppTypography.headline.copyWith(
+            fontSize: 22,
+            color: AppColors.onSurface,
+            letterSpacing: -0.5,
+          ),
+        ),
+      ],
     );
   }
 }
