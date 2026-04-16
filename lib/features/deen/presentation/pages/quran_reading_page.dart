@@ -246,7 +246,7 @@ class _LastReadSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
+        const Row(
           children: [
             Expanded(
               child: _LastReadCard(
@@ -258,7 +258,7 @@ class _LastReadSection extends StatelessWidget {
                 onSurfaceColor: AppColors.quranOnSecondaryContainer,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: _LastReadCard(
                 title: 'Al-Mumtahanah',
@@ -525,7 +525,7 @@ class _SurahHeroCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Positioned(
+          const Positioned(
             right: 0,
             top: 0,
             bottom: 0,
@@ -687,7 +687,7 @@ class _VerseList extends StatelessWidget {
                     Container(
                       width: 32,
                       height: 32,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.quranSurfaceLow,
                         shape: BoxShape.circle,
                       ),
@@ -908,7 +908,7 @@ class _QuranQuickToolsDrawer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _DrawerSection(
+                    const _DrawerSection(
                       title: 'NAVIGATION CONTEXT',
                       child: Wrap(
                         spacing: 8,
@@ -923,7 +923,7 @@ class _QuranQuickToolsDrawer extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    _DrawerSection(
+                    const _DrawerSection(
                       title: 'DISPLAY PREFERENCES',
                       child: Column(
                         children: [
@@ -931,17 +931,17 @@ class _QuranQuickToolsDrawer extends StatelessWidget {
                               label: 'Arabic Script',
                               icon: Icons.auto_stories_rounded,
                               isActive: true),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _ToggleItem(
                               label: 'Translation',
                               icon: Icons.translate_rounded,
                               isActive: true),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _ToggleItem(
                               label: 'Tafsir',
                               icon: Icons.menu_book_rounded,
                               isActive: false),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _ToggleItem(
                               label: 'Word by Word',
                               icon: Icons.rebase_edit,
@@ -989,9 +989,9 @@ class _QuranQuickToolsDrawer extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          _FontSlider(label: 'Arabic Font Size', value: 32),
+                          const _FontSlider(label: 'Arabic Font Size', value: 32),
                           const SizedBox(height: 24),
-                          _FontSlider(label: 'Translation Font Size', value: 16),
+                          const _FontSlider(label: 'Translation Font Size', value: 16),
                         ],
                       ),
                     ),
