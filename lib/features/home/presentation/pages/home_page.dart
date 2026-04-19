@@ -16,7 +16,6 @@ import '../../../../core/providers/connectivity_provider.dart';
 import '../../../prayer_times/providers/active_window_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../features/settings/providers/location_providers.dart';
-import '../../../../features/settings/providers/settings_providers.dart';
 
 
 class HomePage extends ConsumerStatefulWidget {
@@ -49,7 +48,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final prayerDataAsync = ref.watch(prayerDataProvider);
     final isConnected = ref.watch(connectivityProvider).value ?? true;
     final locationAsync = ref.watch(locationProvider);
-    final isHanafi = ref.watch(isHanafiProvider);
 
     return prayerDataAsync.when(
       loading: () => const Scaffold(

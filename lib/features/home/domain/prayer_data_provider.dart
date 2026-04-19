@@ -29,16 +29,15 @@ class PrayerDataNotifier extends AsyncNotifier<PrayerData> {
       loading: () => _handleLoading(),
       error: (err, stack) => Future.error(err, stack),
       data: (location) async {
-        if (location == null) {
-          return Future.error('Location unavailable. Please enable GPS or set manual location.');
-        }
+        // location will always be non-null thanks to Mumbai fallback in LocationManager
+        final activeLocation = location!;
 
         return _calculatePrayerData(
-          lat: location.latitude,
-          lon: location.longitude,
+          lat: activeLocation.latitude,
+          lon: activeLocation.longitude,
           method: methodOption.toAdhan(),
           madhab: isHanafi ? Madhab.hanafi : Madhab.shafi,
-          cityName: location.displayAddress,
+          cityName: activeLocation.displayAddress,
         );
       },
     );

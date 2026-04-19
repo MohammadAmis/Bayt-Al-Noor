@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/design_tokens.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/services/supabase_service.dart';
+import '../../../../core/design_tokens.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,6 +14,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isPasswordVisible = false;
   bool _isLoading = false;
 
   @override
@@ -20,16 +24,34 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRegister() async {
     final email = _emailController.text.trim();
     final name = _nameController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
 
-    if (email.isEmpty || name.isEmpty) {
+    if (email.isEmpty || name.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 6 characters')),
       );
       return;
     }
@@ -37,18 +59,21 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Using OTP-based sign up (Magic Link) as requested "no password" flow
-      await Supabase.instance.client.auth.signInWithOtp(
+      await SupabaseService.instance.signUp(
         email: email,
-        data: {'full_name': name},
-        shouldCreateUser: true,
+        password: password,
+        fullName: name,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verification link sent to your email!')),
+          const SnackBar(content: Text('Verification code sent to your email!')),
         );
-        Navigator.pushReplacementNamed(context, '/otp-verification', arguments: email);
+        Navigator.pushReplacementNamed(
+          context, 
+          '/otp-verification', 
+          arguments: {'email': email, 'isRecovery': false},
+        );
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -185,6 +210,26 @@ class _RegisterPageState extends State<RegisterPage> {
                                     hintText: '+1 (555) 000-0000',
                                     keyboardType: TextInputType.phone,
                                   ),
+                                  const SizedBox(height: 24),
+                                  _buildInputLabel('PASSWORD'),
+                                  const SizedBox(height: 8),
+                                  _buildCustomTextField(
+                                    controller: _passwordController,
+                                    hintText: '••••••••',
+                                    isPassword: true,
+                                    obscureText: !_isPasswordVisible,
+                                    onToggleVisibility: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  _buildInputLabel('CONFIRM PASSWORD'),
+                                  const SizedBox(height: 8),
+                                  _buildCustomTextField(
+                                    controller: _confirmPasswordController,
+                                    hintText: '••••••••',
+                                    isPassword: true,
+                                    obscureText: !_isPasswordVisible,
+                                    onToggleVisibility: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                                  ),
                                   const SizedBox(height: 32),
 
                                   // Action Button
@@ -290,10 +335,18 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildCustomTextField({required TextEditingController controller, required String hintText, required TextInputType keyboardType}) {
+  Widget _buildCustomTextField({
+    required TextEditingController controller, 
+    required String hintText, 
+    TextInputType keyboardType = TextInputType.text,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
+  }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: AppTypography.body.copyWith(color: AppColors.outline.withValues(alpha:0.5), fontSize: 14),
@@ -303,6 +356,14 @@ class _RegisterPageState extends State<RegisterPage> {
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
+        suffixIcon: isPassword ? IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: AppColors.outline,
+            size: 20,
+          ),
+          onPressed: onToggleVisibility,
+        ) : null,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
     );

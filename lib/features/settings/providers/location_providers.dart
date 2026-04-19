@@ -139,15 +139,28 @@ class LocationManager extends StateNotifier<AsyncValue<AppLocation?>> {
       if (fresh != null) {
         state = AsyncValue.data(fresh);
       }
-    } catch (error, stack) {
+    } catch (error) {
       // Fallback to cached if available
       final cached = await _repository.getCachedLocation();
       if (cached != null) {
         state = AsyncValue.data(cached.copyWith(source: LocationSource.fallback));
       } else {
-        state = AsyncValue.error(error, stack);
+        // Ultimate fallback to Mumbai instead of error
+        state = AsyncValue.data(_getMumbaiFallback());
       }
     }
+  }
+
+  /// Ultimate fallback: Mumbai coordinates (19.0760, 72.8777)
+  AppLocation _getMumbaiFallback() {
+    return AppLocation(
+      latitude: 19.0760,
+      longitude: 72.8777,
+      address: 'Mumbai, India',
+      countryCode: 'IN',
+      timestamp: DateTime.now(),
+      source: LocationSource.fallback,
+    );
   }
   
   /// Actually fetch from geolocator (separate method for background refresh)
@@ -252,28 +265,12 @@ class LocationManager extends StateNotifier<AsyncValue<AppLocation?>> {
         return;
       }
       
-      // Ultimate fallback: default to Makkah
-      final defaultLocation = AppLocation(
-        latitude: 21.4225,
-        longitude: 39.8262,
-        address: 'Makkah, Saudi Arabia',
-        countryCode: 'SA',
-        timestamp: DateTime.now(),
-        source: LocationSource.fallback,
-      );
-      state = AsyncValue.data(defaultLocation);
+      // Fallback to Mumbai instead of Makkah (per user requirement)
+      state = AsyncValue.data(_getMumbaiFallback());
       
     } catch (error) {
-      // Fallback to default
-      final defaultLocation = AppLocation(
-        latitude: 21.4225,
-        longitude: 39.8262,
-        address: 'Makkah, Saudi Arabia',
-        countryCode: 'SA',
-        timestamp: DateTime.now(),
-        source: LocationSource.fallback,
-      );
-      state = AsyncValue.data(defaultLocation);
+      // Fallback to Mumbai
+      state = AsyncValue.data(_getMumbaiFallback());
     }
   }
   

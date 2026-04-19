@@ -269,7 +269,6 @@ class _RealTimePrayerClockState extends State<RealTimePrayerClock> {
     }
 
     // 3. Add Preferred markers for Duha
-    final delta = widget.prayerTimes.maghrib.difference(widget.prayerTimes.sunrise).inMinutes; // Morning duration (sunrise to sunset approx?) 
     // Wait, the Python used Zawal for delta. In our app Zawal is dhuhr-15.
     final morningDuration = widget.prayerTimes.dhuhr.subtract(const Duration(minutes: 15)).difference(widget.prayerTimes.sunrise).inMinutes;
     

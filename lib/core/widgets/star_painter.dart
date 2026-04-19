@@ -30,7 +30,6 @@ class IslamicStarPainter extends CustomPainter {
 
     for (int i = 0; i < points; i++) {
       final angle = i * angleStep - math.pi / 2;
-      final nextAngle = (i + 1) * angleStep - math.pi / 2;
       final midAngle = angle + angleStep / 2;
 
       final outerPoint = Offset(

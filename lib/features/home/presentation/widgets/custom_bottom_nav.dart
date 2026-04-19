@@ -31,7 +31,7 @@ class CustomFloatingBottomNav extends StatelessWidget {
             _buildNavItem(Icons.auto_awesome_motion, 'Home', true),
             _buildNavItem(Icons.explore_outlined, 'Qibla', false),
             _buildNavItem(Icons.ads_click, 'Tasbih', false),
-            _buildNavItem(Icons.group_outlined, 'Community', false),
+            _buildNavItem(Icons.hub_outlined, 'Circle', false),
           ],
         ),
       ),

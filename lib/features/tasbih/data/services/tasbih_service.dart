@@ -78,8 +78,8 @@ class TasbihService with ChangeNotifier {
       try {
         final profile = await SupabaseService.instance.getUserProfile(user.id);
         if (profile != null) {
-          final remoteLifetime = profile['tasbih_total'] as int? ?? 0;
-          final remoteStreak = profile['tasbih_streak'] as int? ?? 0;
+          final remoteLifetime = profile.tasbihTotal;
+          final remoteStreak = profile.tasbihStreak;
           
           if (remoteLifetime > _lifetimeTotal) {
             _lifetimeTotal = remoteLifetime;
@@ -88,9 +88,8 @@ class TasbihService with ChangeNotifier {
             _streak = remoteStreak;
           }
           
-          final remoteLastDate = profile['last_tasbih_date'] as String?;
-          if (remoteLastDate != null) {
-            _lastTasbihDate = DateTime.parse(remoteLastDate);
+          if (profile.lastTasbihDate != null) {
+            _lastTasbihDate = profile.lastTasbihDate;
           }
           
           await _saveLocally();

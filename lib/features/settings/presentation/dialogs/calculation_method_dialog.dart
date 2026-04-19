@@ -21,44 +21,46 @@ class CalculationMethodDialog extends ConsumerWidget {
       content: Container(
         width: double.maxFinite,
         constraints: const BoxConstraints(maxHeight: 400),
-        child: ListView(
-          shrinkWrap: true,
-          children: CalculationMethodOption.values.map((method) {
-            final isSelected = currentMethod == method;
-
-            return ListTile(
-              title: Text(
-                method.displayName,
-                style: AppTypography.body.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.onSurface,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        child: RadioGroup<CalculationMethodOption>(
+          groupValue: currentMethod,
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(calculationMethodProvider.notifier).update(value);
+              Navigator.pop(context);
+            }
+          },
+          child: ListView(
+            shrinkWrap: true,
+            children: CalculationMethodOption.values.map((method) {
+              final isSelected = currentMethod == method;
+  
+              return ListTile(
+                title: Text(
+                  method.displayName,
+                  style: AppTypography.body.copyWith(
+                    color: isSelected ? AppColors.primary : AppColors.onSurface,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                method.recommendedRegions,
-                style: AppTypography.label.copyWith(
-                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
-                  fontSize: 11,
+                subtitle: Text(
+                  method.recommendedRegions,
+                  style: AppTypography.label.copyWith(
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-              leading: Radio<CalculationMethodOption>(
-                value: method,
-                groupValue: currentMethod,
-                activeColor: AppColors.primary,
-                onChanged: (value) {
-                  if (value != null) {
-                    ref.read(calculationMethodProvider.notifier).update(value);
-                    Navigator.pop(context);
-                  }
+                leading: Radio<CalculationMethodOption>(
+                  value: method,
+                  activeColor: AppColors.primary,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                onTap: () {
+                  ref.read(calculationMethodProvider.notifier).update(method);
+                  Navigator.pop(context);
                 },
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-              onTap: () {
-                ref.read(calculationMethodProvider.notifier).update(method);
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
       actions: [

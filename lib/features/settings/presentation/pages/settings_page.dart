@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +12,7 @@ import '../dialogs/calculation_method_dialog.dart';
 import '../dialogs/location_input_dialog.dart';
 import '../../providers/location_providers.dart';
 import '../../../../../core/providers/app_preferences_provider.dart';
+import '../../../community/data/providers/chat_providers.dart';
 import '../widgets/rescheduling_status_banner.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -159,31 +161,41 @@ class SettingsPage extends ConsumerWidget {
                   },
                 ),
                 _Divider(),
-                LocationSettingTile(
-                  locationName: useAutoLocation
-                      ? (locationAsync.value?.address ?? 'Detecting...')
-                      : manualLocationName,
-                  coordinates: useAutoLocation
-                      ? (locationAsync.value != null
-                          ? '${locationAsync.value!.latitude.toStringAsFixed(4)}, ${locationAsync.value!.longitude.toStringAsFixed(4)}'
-                          : null)
-                      : null,
-                  isAuto: useAutoLocation,
-                  isLoading: locationAsync.isLoading,
-                  onRefresh: useAutoLocation
-                      ? () => ref.read(locationManagerProvider.notifier).refresh()
-                      : null,
-                  onEdit: !useAutoLocation
-                      ? () => showDialog(
-                            context: context,
-                            builder: (_) => LocationInputDialog(
-                              initialLocation: manualLocationName,
-                              onSave: (val) {
-                                ref.read(manualLocationNameProvider.notifier).update(val);
-                              },
-                            ),
-                          )
-                      : null,
+                locationAsync.maybeWhen(
+                  data: (location) => LocationSettingTile(
+                    locationName: useAutoLocation
+                        ? (location?.address ?? 'Detecting...')
+                        : manualLocationName,
+                    coordinates: useAutoLocation
+                        ? (location != null
+                            ? '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}'
+                            : null)
+                        : null,
+                    isAuto: useAutoLocation,
+                    isLoading: locationAsync.isLoading,
+                    onRefresh: useAutoLocation
+                        ? () => ref.read(locationManagerProvider.notifier).refresh()
+                        : null,
+                    onEdit: !useAutoLocation
+                        ? () => showDialog(
+                              context: context,
+                              builder: (_) => LocationInputDialog(
+                                initialLocation: manualLocationName,
+                                onSave: (val) {
+                                  ref.read(manualLocationNameProvider.notifier).update(val);
+                                },
+                              ),
+                            )
+                        : null,
+                  ),
+                  orElse: () => LocationSettingTile(
+                    locationName: useAutoLocation ? 'Fetching location...' : manualLocationName,
+                    isAuto: useAutoLocation,
+                    isLoading: locationAsync.isLoading,
+                    onRefresh: useAutoLocation
+                        ? () => ref.read(locationManagerProvider.notifier).refresh()
+                        : null,
+                  ),
                 ),
               ],
             ),
@@ -256,6 +268,15 @@ class SettingsPage extends ConsumerWidget {
                   iconColor: AppColors.primary,
                   trailingIcon: Icons.open_in_new_rounded,
                   onTap: () => _openPrivacyPolicy(context),
+                ),
+                _Divider(),
+                _PremiumNavTile(
+                  title: 'Sign Out',
+                  subtitle: 'Log out of your account',
+                  icon: Icons.logout_rounded,
+                  iconColor: AppColors.error,
+                  trailingIcon: Icons.chevron_right_rounded,
+                  onTap: () => _handleLogout(context, ref),
                 ),
               ],
             ),
@@ -348,6 +369,23 @@ class SettingsPage extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not open privacy policy')),
+        );
+      }
+    }
+  }
+
+  void _handleLogout(BuildContext context, WidgetRef ref) async {
+    try {
+      final repo = ref.read(chatRepositoryProvider);
+      await SupabaseService.instance.signOut(repo);
+      if (context.mounted) {
+        // Clear navigation stack and go to login
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logout failed: $e'), backgroundColor: AppColors.error),
         );
       }
     }

@@ -136,49 +136,52 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     ],
                     
                     // Kufic Logo Emblem
-                    // Image.asset(
-                    //   'assets/logo_2.png',
-                    //   height: 32,
-                    //   fit: BoxFit.contain,
-                    // ),
-                    Text(
-                      'بيت النور',
-                      style: AppTypography.headline.copyWith(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'بيت النور',
+                          style: AppTypography.headline.copyWith(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                     ),
                     
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     
                     // Context (Location OR Screen Name)
-                    Expanded(
+                    Flexible(
+                      flex: 2,
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             width: 1,
                             height: 16,
                             color: AppColors.primary.withValues(alpha: 0.15),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                          const SizedBox(width: 8),
+                          Flexible(
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (isMainScreen) ...[
                                   const Icon(Icons.location_on_rounded,
                                       size: 14, color: AppColors.primary),
                                   const SizedBox(width: 4),
                                 ],
-                                Expanded(
+                                Flexible(
                                   child: Text(
                                     (isMainScreen ? location : title).toUpperCase(),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: AppTypography.label.copyWith(
                                       color: AppColors.primary.withValues(alpha: 0.6),
-                                      fontSize: 11,
-                                      letterSpacing: 1.2,
+                                      fontSize: 10,
+                                      letterSpacing: 1.1,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
@@ -196,17 +199,16 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
               // Right Section
               Row(
                 mainAxisSize: MainAxisSize.min,
-                
                 children: [
                   if (onSettingsPressed != null)
                     IconButton(
                       onPressed: onSettingsPressed,
                       icon: const Icon(Icons.settings_outlined,
-                          size: 24, color: AppColors.primary),
+                          size: 22, color: AppColors.primary),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
-                    const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   if (isMainScreen && onProfilePressed != null) ...[
                     GestureDetector(
                       onTap: onProfilePressed,
@@ -219,15 +221,13 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                               width: 1),
                         ),
                         child: CircleAvatar(
-                          radius: 20,
+                          radius: 18,
                           backgroundImage: NetworkImage(profileImageUrl ??
                               'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y'),
                         ),
                       ),
                     ),
-                    // const SizedBox(width: 8),
                   ],
-                  
                 ],
               ),
             ],
@@ -238,5 +238,5 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(100);
+  Size get preferredSize => const Size.fromHeight(64);
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
 
 class OtpVerificationPage extends StatefulWidget {
@@ -87,14 +88,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     setState(() => _isLoading = true);
 
     try {
-      await Supabase.instance.client.auth.verifyOTP(
+      await SupabaseService.instance.verifyOtp(
         type: isRecovery ? OtpType.recovery : OtpType.signup,
         email: email,
         token: otp,
       );
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/new-password');
+        if (isRecovery) {
+          Navigator.pushReplacementNamed(context, '/new-password');
+        } else {
+          Navigator.pushReplacementNamed(context, '/main');
+        }
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -127,7 +132,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     });
 
     try {
-      await Supabase.instance.client.auth.signInWithOtp(email: email);
+      await SupabaseService.instance.signInWithOtp(email: email);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('A new code has been sent to your email')),

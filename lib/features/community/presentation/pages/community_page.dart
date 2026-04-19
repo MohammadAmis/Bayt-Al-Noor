@@ -1,28 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
-import '../../../profile/presentation/pages/public_profile_page.dart';
+import '../../data/providers/chat_providers.dart';
+import '../../domain/entities/chat_entity.dart';
 import 'chat_page.dart';
+import 'user_selection_page.dart';
 
-class CommunityPage extends StatefulWidget {
+class CommunityPage extends ConsumerStatefulWidget {
   const CommunityPage({super.key});
 
   @override
-  State<CommunityPage> createState() => _CommunityPageState();
+  ConsumerState<CommunityPage> createState() => _CommunityPageState();
 }
 
-class _CommunityPageState extends State<CommunityPage> {
+class _CommunityPageState extends ConsumerState<CommunityPage> {
   String _activeFilter = 'All Messages';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final chatListAsync = ref.watch(chatListProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
-        title: 'Community',
+        title: 'Circle',
         isMainScreen: true,
-        location: 'Community',
+        location: 'Circle',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
         onProfilePressed: () => Navigator.push(
           context,
@@ -37,7 +49,7 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0), // Above bottom nav
+        padding: const EdgeInsets.only(bottom: 80.0),
         child: Container(
           height: 64,
           width: 64,
@@ -57,36 +69,91 @@ class _CommunityPageState extends State<CommunityPage> {
             ],
           ),
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserSelectionPage()),
+            ),
             backgroundColor: Colors.transparent,
             elevation: 0,
             child: const Icon(Icons.edit_square, color: Colors.white, size: 28),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar
-            _chatSearchBar(),
+      body: chatListAsync.when(
+        data: (chats) {
+          final filteredChats = chats.where((chat) {
+      final matchesFilter = switch (_activeFilter) {
+        'Groups' => chat.type == 'group',
+        'Private' => chat.type == 'private',
+        'Pinned' => chat.isPinned,
+        _ => true,
+      };
 
-            const SizedBox(height: 16),
+            final matchesSearch = chat.displayTitle
+                .toLowerCase()
+                .contains(_searchController.text.toLowerCase());
 
-            // Category Filter Chips
-            _buildFilterChips(),
+            return matchesFilter && matchesSearch;
+          }).toList();
 
-            const SizedBox(height: 16),
-
-            // Chat List Section
-            _buildChatList(),
-            const SizedBox(height: 16),
-          ],
-        ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _chatSearchBar(),
+                const SizedBox(height: 16),
+                _buildFilterChips(),
+                const SizedBox(height: 16),
+                _buildChatList(filteredChats),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
+  }
+
+  Future<void> _confirmDeleteChat(String chatId, String chatName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Sanctuary?'),
+        content: Text('Are you sure you want to remove "$chatName"? This will delete all messages for everyone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await ref.read(chatRepositoryProvider).deleteChat(chatId);
+        // Explicitly invalidate to force a fresh fetch from remote
+        ref.invalidate(chatListProvider);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sanctuary removed.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete: $e')),
+          );
+        }
+      }
+    }
   }
 
   Widget _chatSearchBar() {
@@ -103,6 +170,8 @@ class _CommunityPageState extends State<CommunityPage> {
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
+              controller: _searchController,
+              onChanged: (val) => setState(() {}),
               decoration: InputDecoration(
                 hintText: 'Search Chat, Group',
                 hintStyle: AppTypography.body.copyWith(
@@ -119,7 +188,7 @@ class _CommunityPageState extends State<CommunityPage> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ['All Messages', 'Groups', 'Private', 'Pinned'];
+    final filters = ['All', 'Groups', 'Private', 'Pinned'];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
@@ -155,77 +224,51 @@ class _CommunityPageState extends State<CommunityPage> {
     );
   }
 
-  Widget _buildChatList() {
+  Widget _buildChatList(List<ChatEntity> chats) {
+    if (chats.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Text('No active chats', style: TextStyle(color: Colors.grey[600])),
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: Column(
-        children: [
-          _ChatItem(
-            title: 'Amir Al-Hussein',
-            subtitle:
-                'As-salamu alaykum. I was reflecting on the beauty of patience...',
-            time: '10:42 AM',
-            unreadCount: 1,
-            isPinned: true,
-            leading: _buildImageAvatar(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuBCJK2wMGg9gMZiUvgQIGnRElk5TNAbyKemys1O17W0kXuyhkl5XylevUyfHrTa9Hop7ubE0lFzqujFUp-j_ZYjFAON2i72aSzYlVsv6h3TvC0D2Ft7KsWAwB8zGVZkE5mWCPcNtirz2RUxCbbbSVxXqirYVkoLN3CIPW-sK6jShiDfrDvRVpFGp9Wjf3IZ_jfBIGsQQCqIGgP5M7JPxAoJ8fxmeiM7Do8heijs_p03yjZw2Vu9gEgK2PlhDPEi-khNkk6FpnaG9Kw'),
-            statusColor: Colors.green,
-          ),
-          const Divider(height: 1, indent: 80, endIndent: 20),
-          _ChatItem(
-            title: 'Zaid Al-Farsi',
-            subtitle:
-                'Assalamu alaikum brothers, I have shared a new reflection on Niyyah.',
-            time: 'Just now',
-            unreadCount: 1,
-            leading: _buildImageAvatar(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuD5y5gtsOjbBE7LbpvBfmKo8fZbKpZceBr0xFGR0rtDEEJAApzvFsfTtlRsyDGWr1vejenevOOo5AwgE3rQMBgeMtixBRqZNDyBXgTcSFsSI-8zrCW6dlZOVLd_0IZlq0kPXX1Z1YFIek_74QK8Oc_mFSA_6SZyUD6lyZE2ozMCWdrunixdrW7uJrZVgPDkZjrsnegc30nHs5E9ZwRrql9KXHQaoNp-OaAAYCLzDIj-jdso_uFAHiuDODph3Mm0Jwiwwa_dTYSTtzE'),
-            statusColor: Colors.green,
-          ),
-          const Divider(height: 1, indent: 80, endIndent: 20),
-          _ChatItem(
-            title: 'Quran Study Group',
-            subtitle:
-                'Zainab: Shall we meet at 7 PM tonight for the Juz 3 review?',
-            time: '09:12 AM',
-            unreadCount: 3,
-            isPinned: true,
-            leading: _buildInitialAvatar('QS', AppColors.secondaryFixedDim),
-            statusColor: Colors.teal,
-          ),
-          const Divider(height: 1, indent: 80, endIndent: 20),
-          _ChatItem(
-            title: 'Sister Mariam',
-            subtitle:
-                'Wa alaikum assalam! I will bring the dates for iftar tomorrow.',
-            time: 'Yesterday',
-            leading: _buildImageAvatar(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuBHXWnkXZZT3gdd5bW7wsGccUqDoIWY2okS_C5BWVYncX1Pia9nlZ3bNUgSVRAzxwUt7z6_tkauDcYZ5RKkoIHU4Hr50CIzGawrB3QSFxnlvkdCBX4Ye-lXA0bQ8Aig_cvWrF4iz-_06i74ipNdxQHYIR62txEAhmcNPpvDn2RD5Q5Kejg6Gcnym-VtVcdRZPErY65IW_ZUGih0fNrFJKt1jTT3Hv837t-YHtL43np5gSjOD3gWi0mMMlnWOttesa338u_heq5EmSU'),
-          ),
-          const Divider(height: 1, indent: 80, endIndent: 20),
-          _ChatItem(
-            title: 'Local Community',
-            subtitle:
-                'Omar: The mosque parking is currently full, please use the side street.',
-            time: 'Yesterday',
-            unreadCount: 12,
-            leading:
-                _buildIconAvatar(Icons.location_on, AppColors.primaryFixedDim),
-          ),
-          const Divider(height: 1, indent: 80, endIndent: 20),
-          _ChatItem(
-            title: 'Brother Yusuf',
-            subtitle: 'JazakAllah Khair for the book recommendation, brother.',
-            time: 'Mon',
-            leading: _buildImageAvatar(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuAnWaoO6PooHAHdfMpBORR3PqOU6B976ECu0B6uesYPLBDPQPrkqq8nA1rlrkAUlB9pw3brb6m7TtNNwNhgqDSbWnAGIT4PtQcG5VFqDzL5w-sjXMrXt4DZlhp_3rp3DfrUZAHvuxWrCFmSD-nme_wWTtfnSn28Jk7EQQcAaz0l2wvht7MAPHo_hGXOkzzvatUH-IeTCJ_oNgQ_xZ6xhFFxwNTxAad36_Fl8kff_oo8OxU_z0l196qss0GlnzYFMEAZEqIsSDBT3VE'),
-          ),
-        ],
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: chats.length,
+        separatorBuilder: (_, __) => const Divider(height: 1, indent: 80, endIndent: 20),
+        itemBuilder: (context, index) {
+          final chat = chats[index];
+          return _ChatItem(
+            chatId: chat.id,
+            title: chat.displayTitle,
+            subtitle: chat.lastMessagePreview ?? 'No messages yet',
+            time: _formatLastMessageTime(chat.lastMessageTime),
+            unreadCount: chat.unreadCount,
+            leading: chat.avatarUrl != null 
+                ? _buildImageAvatar(chat.avatarUrl!) 
+                : _buildInitialAvatar(chat.displayTitle.isNotEmpty ? chat.displayTitle[0] : '?', AppColors.primaryFixedDim),
+            onDelete: () => _confirmDeleteChat(chat.id, chat.displayTitle),
+          );
+        },
       ),
     );
+  }
+
+  String _formatLastMessageTime(DateTime? time) {
+    if (time == null) return '';
+    final localTime = time.toLocal();
+    final hour = localTime.hour == 0 ? 12 : (localTime.hour > 12 ? localTime.hour - 12 : localTime.hour);
+    final minute = localTime.minute.toString().padLeft(2, '0');
+    final amPm = localTime.hour >= 12 ? 'PM' : 'AM';
+    return "$hour:$minute $amPm";
   }
 
   Widget _buildInitialAvatar(String text, Color color) {
@@ -237,7 +280,7 @@ class _CommunityPageState extends State<CommunityPage> {
         child: Text(
           text,
           style: const TextStyle(
-              color: AppColors.onSecondaryFixedVariant,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 18),
         ),
@@ -256,123 +299,47 @@ class _CommunityPageState extends State<CommunityPage> {
       ),
     );
   }
-
-  Widget _buildIconAvatar(IconData icon, Color color) {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Icon(icon, color: AppColors.onPrimaryFixed, size: 28),
-    );
-  }
 }
 
 class _ChatItem extends StatelessWidget {
+  final String chatId;
   final String title;
   final String subtitle;
   final String time;
   final int unreadCount;
-  final bool isPinned;
   final Widget leading;
-  final Color? statusColor;
+  final VoidCallback onDelete;
 
   const _ChatItem({
+    required this.chatId,
     required this.title,
     required this.subtitle,
     required this.time,
     this.unreadCount = 0,
-    this.isPinned = false,
     required this.leading,
-    this.statusColor,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (title == 'Amir Al-Hussein') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChatPage(
-                type: ChatType.private,
-                title: 'Amir Al-Hussein',
-                subtitle: 'ACTIVE NOW',
-                avatarUrl:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBCJK2wMGg9gMZiUvgQIGnRElk5TNAbyKemys1O17W0kXuyhkl5XylevUyfHrTa9Hop7ubE0lFzqujFUp-j_ZYjFAON2i72aSzYlVsv6h3TvC0D2Ft7KsWAwB8zGVZkE5mWCPcNtirz2RUxCbbbSVxXqirYVkoLN3CIPW-sK6jShiDfrDvRVpFGp9Wjf3IZ_jfBIGsQQCqIGgP5M7JPxAoJ8fxmeiM7Do8heijs_p03yjZw2Vu9gEgK2PlhDPEi-khNkk6FpnaG9Kw',
-              ),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              chatId: chatId,
+              chatTitle: title,
+              chatAvatar: null, // Can extract from leading if needed
             ),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChatPage(
-                type: ChatType.community,
-                title: 'Sacred Rhythm',
-                subtitle: 'COMMUNITY CIRCLE',
-              ),
-            ),
-          );
-        }
+          ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    final isZaid = title == 'Zaid Al-Farsi';
-                    String avatar =
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuAnWaoO6PooHAHdfMpBORR3PqOU6B976ECu0B6uesYPLBDPQPrkqq8nA1rlrkAUlB9pw3brb6m7TtNNwNhgqDSbWnAGIT4PtQcG5VFqDzL5w-sjXMrXt4DZlhp_3rp3DfrUZAHvuxWrCFmSD-nme_wWTtfnSn28Jk7EQQcAaz0l2wvht7MAPHo_hGXOkzzvatUH-IeTCJ_oNgQ_xZ6xhFFxwNTxAad36_Fl8kff_oo8OxU_z0l196qss0GlnzYFMEAZEqIsSDBT3VE';
-
-                    final leadingWidget = leading;
-                    if (leadingWidget is Container &&
-                        leadingWidget.decoration is BoxDecoration) {
-                      final decoration =
-                          leadingWidget.decoration as BoxDecoration;
-                      if (decoration.image != null &&
-                          decoration.image!.image is NetworkImage) {
-                        avatar = (decoration.image!.image as NetworkImage).url;
-                      }
-                    }
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PublicProfilePage(
-                          name: title,
-                          avatarUrl: avatar,
-                          bio: isZaid
-                              ? 'Seeking wisdom through the words of the Sahaba. Enthusiastic about Islamic history and community service.'
-                              : '"Seeking tranquility in the rhythm of prayer and the wisdom of the word."',
-                          reflectionsCount: isZaid ? 156 : 12,
-                          followersCount: isZaid ? 89 : 45,
-                          followingCount: isZaid ? 12 : 30,
-                        ),
-                      ),
-                    );
-                  },
-                  child: leading,
-                ),
-                if (statusColor != null)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.surface, width: 2),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            leading,
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -411,32 +378,10 @@ class _ChatItem extends StatelessWidget {
                 ],
               ),
             ),
-            if (unreadCount > 0 || isPinned) ...[
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (unreadCount > 0)
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                          color: AppColors.primary, shape: BoxShape.circle),
-                      child: Text(
-                        unreadCount.toString(),
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  if (isPinned) ...[
-                    const SizedBox(height: 4),
-                    const Icon(Icons.push_pin,
-                        size: 14, color: AppColors.outline),
-                  ],
-                ],
-              ),
-            ],
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: AppColors.outline, size: 20),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),

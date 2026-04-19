@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/design_tokens.dart';
-import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/star_painter.dart';
 
 class QuranReadingPage extends StatefulWidget {
@@ -1107,7 +1106,7 @@ class _ToggleItem extends StatelessWidget {
           Switch.adaptive(
             value: isActive,
             onChanged: (_) {},
-            activeColor: AppColors.quranPrimary,
+            activeTrackColor: AppColors.quranPrimary,
           ),
         ],
       ),
