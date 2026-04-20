@@ -72,7 +72,6 @@ class ChatModel {
     };
   }
 
-  @override
   ChatEntity toEntity({String? currentUserId, Map<String, ProfileEntity>? profileRegistry}) {
     String? resolvedName = name;
     String? resolvedAvatar = avatarUrl;

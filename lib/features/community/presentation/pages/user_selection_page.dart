@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../domain/entities/profile_entity.dart';
@@ -124,7 +123,6 @@ class _UserSelectionPageState extends ConsumerState<UserSelectionPage> {
     } else {
       // 1-on-1 Flow: LAZY creation (Deferred until first message)
       // Check if it already exists purely to choose between Real ID and Draft ID
-      final repo = ref.read(chatRepositoryProvider);
       
       // Brief check for existing chat (to avoid draft flickering)
       // We use the Repo's logic which is now consolidated

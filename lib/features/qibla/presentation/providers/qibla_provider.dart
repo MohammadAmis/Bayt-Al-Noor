@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'dart:math' as math;
 
 // ✅ Domain
 import '../../domain/entities/qibla_direction.dart';
@@ -19,6 +21,7 @@ class QiblaState {
   final bool isLoading;
   final String? error;
   final bool isCalibrating;
+  final bool isTilted; // Add tilt state
 
   const QiblaState({
     this.direction,
@@ -26,6 +29,7 @@ class QiblaState {
     this.isLoading = false,
     this.error,
     this.isCalibrating = false,
+    this.isTilted = false,
   });
 
   QiblaState copyWith({
@@ -34,6 +38,7 @@ class QiblaState {
     bool? isLoading,
     String? error,
     bool? isCalibrating,
+    bool? isTilted,
   }) {
     return QiblaState(
       direction: direction ?? this.direction,
@@ -41,6 +46,7 @@ class QiblaState {
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       isCalibrating: isCalibrating ?? this.isCalibrating,
+      isTilted: isTilted ?? this.isTilted,
     );
   }
 }
@@ -54,12 +60,19 @@ final qiblaProvider = StateNotifierProvider<QiblaNotifier, QiblaState>((ref) {
 class QiblaNotifier extends StateNotifier<QiblaState> {
   final Ref _ref;
   StreamSubscription<double>? _headingSubscription;
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   final LocationService _locationService = GeolocatorLocationService();
 
   QiblaNotifier(this._ref) : super(const QiblaState());
 
   /// Initialize Qibla using your EXISTING AppLocation provider
-  Future<void> initialize() async {
+  Future<void> initialize({bool force = false}) async {
+    // Prevent redundant initialization if already loaded/loading
+    if (!force && state.direction != null && !state.isLoading) {
+      _startHeadingListener(); // Just ensure listener is running
+      return;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -101,8 +114,9 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
         error: null,
       );
 
-      // Start compass heading listener for real-time rotation
+      // Start sensors for real-time interaction
       _startHeadingListener();
+      _startTiltListener();
     } catch (e) {
       // In production: log to FirebaseCrashlytics
       state = state.copyWith(
@@ -114,7 +128,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
 
   /// Listen to compass heading for real-time needle rotation
   void _startHeadingListener() {
-    _headingSubscription?.cancel();
+    if (_headingSubscription != null) return; // Already listening
 
     // Compass not reliable on web - use static heading
     if (_isWeb()) {
@@ -123,12 +137,51 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
     }
 
     _headingSubscription = _locationService.headingStream
-        .debounceTime(
-            const Duration(milliseconds: 100)) // Throttle for performance
+        .scan<Map<String, double>>((acc, heading, _) {
+          // Trigonometric smoothing to handle circular wrap-around (0/360)
+          const double alpha = 0.15; // Smoothing factor (lower = smoother)
+          final double rad = heading * math.pi / 180;
+          
+          final double sin = (acc['sin'] ?? math.sin(rad)) * (1 - alpha) + math.sin(rad) * alpha;
+          final double cos = (acc['cos'] ?? math.cos(rad)) * (1 - alpha) + math.cos(rad) * alpha;
+          
+          return {'sin': sin, 'cos': cos};
+        }, {})
+        .map((acc) {
+          final double heading = math.atan2(acc['sin']!, acc['cos']!) * 180 / math.pi;
+          return (heading + 360) % 360;
+        })
         .listen(
-          (heading) => state = state.copyWith(deviceHeading: heading),
+          (smoothedHeading) => state = state.copyWith(deviceHeading: smoothedHeading),
           onError: (_) => state = state.copyWith(deviceHeading: 0.0),
         );
+  }
+
+  /// Listen to accelerometer to detect if device is held flat
+  void _startTiltListener() {
+    _accelerometerSubscription?.cancel();
+    
+    _accelerometerSubscription = accelerometerEventStream().listen((event) {
+      // Calculate tilt angle from gravity vector
+      // When flat, Z is ~9.8. When vertical, Z is ~0.
+      final double x = event.x;
+      final double y = event.y;
+      final double z = event.z;
+      
+      // Calculate overall tilt in degrees
+      final double g = math.sqrt(x * x + y * y + z * z);
+      if (g == 0) return;
+      
+      final double cosTilt = z / g;
+      final double tiltDegrees = math.acos(cosTilt.clamp(-1.0, 1.0)) * 180 / math.pi;
+      
+      // We consider it "tilted" if more than 25 degrees from horizontal
+      final bool isTiltedNow = tiltDegrees > 25.0;
+      
+      if (state.isTilted != isTiltedNow) {
+        state = state.copyWith(isTilted: isTiltedNow);
+      }
+    });
   }
 
   /// Manual recalibration (user tapped refresh)
@@ -202,6 +255,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
   @override
   void dispose() {
     _headingSubscription?.cancel();
+    _accelerometerSubscription?.cancel();
     super.dispose();
   }
 }

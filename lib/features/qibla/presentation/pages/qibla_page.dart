@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -24,11 +25,34 @@ class QiblaPage extends ConsumerStatefulWidget {
 }
 
 class _QiblaPageState extends ConsumerState<QiblaPage> {
+  DateTime? _lastSnackbarTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔒 Lock to Portrait for compass accuracy
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // 🔓 Restore orientation settings
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // ⏳ Location side-effect: Listen for location arrival to initialize Qibla
     ref.listen<AsyncValue<AppLocation?>>(locationProvider, (previous, next) {
-      if (next.value != null) {
+      if (next.value != null && previous?.value == null) {
         ref.read(qiblaProvider.notifier).initialize();
       }
     });
@@ -84,14 +108,27 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                 size: 300,
                 onAligned: () {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✓ You are facing the Qibla'),
-                        backgroundColor: AppColors.celestialGold,
-                        duration: Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
+                    final now = DateTime.now();
+                    // 🛡️ Cooldown: Don't show again for at least 10 seconds to avoid spam
+                    if (_lastSnackbarTime == null || 
+                        now.difference(_lastSnackbarTime!) > const Duration(seconds: 10)) {
+                      _lastSnackbarTime = now;
+                      
+                      // 🚀 Post-frame execution to avoid "showSnackBar called during build" crash
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('✓ You are facing the Qibla'),
+                              backgroundColor: AppColors.celestialGold,
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      });
+                    }
                   }
                 },
               ),
@@ -136,6 +173,8 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
           ],
         ),
       ),
+      // ✨ ADDED: Tilt Warning Overlay
+      bottomSheet: qiblaState.isTilted ? const _TiltWarningSheet() : null,
     );
   }
 
@@ -374,6 +413,112 @@ class _ErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// ✨ Premium Tilt Warning Widget
+class _TiltWarningSheet extends StatelessWidget {
+  const _TiltWarningSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 40,
+            offset: const Offset(0, -10),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.celestialGold.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.screen_rotation_outlined,
+              color: AppColors.celestialGold,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'LEVEL YOUR DEVICE',
+            style: AppTypography.label.copyWith(
+              color: AppColors.celestialGold,
+              letterSpacing: 2,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'For maximum accuracy, please hold your phone flat like a plate.',
+            textAlign: TextAlign.center,
+            style: AppTypography.body.copyWith(
+              color: AppColors.outline,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Interactive visual aid: A simple level bubble
+          _LevelVisualAid(),
+        ],
+      ),
+    );
+  }
+}
+
+class _LevelVisualAid extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 12,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Container(
+              width: 2,
+              height: 12,
+              color: AppColors.celestialGold.withValues(alpha: 0.5),
+            ),
+          ),
+          // The "bubble" is off-center in this conceptual aid to indicate error
+          Positioned(
+            left: 20,
+            child: Container(
+              width: 30,
+              height: 12,
+              decoration: BoxDecoration(
+                color: AppColors.celestialGold,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.celestialGold.withValues(alpha: 0.4),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

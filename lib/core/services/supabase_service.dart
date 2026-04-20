@@ -148,6 +148,7 @@ class SupabaseService {
     int? tasbihTotal,
     int? tasbihStreak,
     String? lastTasbihDate,
+    Map<String, int>? tasbihHistory,
   }) async {
     final updates = {
       'id': userId,
@@ -161,6 +162,7 @@ class SupabaseService {
       if (tasbihTotal != null) 'tasbih_total': tasbihTotal,
       if (tasbihStreak != null) 'tasbih_streak': tasbihStreak,
       if (lastTasbihDate != null) 'last_tasbih_date': lastTasbihDate,
+      if (tasbihHistory != null) 'tasbih_history': tasbihHistory,
     };
 
     await _client.from('profiles').upsert(updates);

@@ -32,6 +32,13 @@ class _CompassDialState extends State<CompassDial>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   bool _isAligned = false;
+  
+  // 🔄 Add state to track continuous rotation
+  double _lastRingHeading = 0;
+  double _totalRingTurns = 0;
+  
+  double _lastNeedleHeading = 0;
+  double _totalNeedleTurns = 0;
 
   @override
   void initState() {
@@ -48,8 +55,34 @@ class _CompassDialState extends State<CompassDial>
   void didUpdateWidget(CompassDial oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.deviceHeading != oldWidget.deviceHeading) {
+      _updateRotationState();
       _checkAlignment();
     }
+  }
+
+  /// Calculate cumulative turns for smooth continuous rotation
+  void _updateRotationState() {
+    final double newHeading = widget.deviceHeading ?? 0;
+    
+    // 1. Ring Rotation (-heading)
+    final double ringTarget = -newHeading;
+    final double ringDelta = _getShortestDelta(ringTarget, _lastRingHeading);
+    _totalRingTurns += ringDelta / 360;
+    _lastRingHeading = ringTarget;
+
+    // 2. Needle Rotation (qibla - heading)
+    final double needleTarget = widget.qiblaDirection.degrees - newHeading;
+    final double needleDelta = _getShortestDelta(needleTarget, _lastNeedleHeading);
+    _totalNeedleTurns += needleDelta / 360;
+    _lastNeedleHeading = needleTarget;
+  }
+
+  /// Helper: Calculate shortest angle difference (-180 to 180)
+  double _getShortestDelta(double target, double current) {
+    double delta = (target - current) % 360;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    return delta;
   }
 
   @override
@@ -83,7 +116,6 @@ class _CompassDialState extends State<CompassDial>
   Widget build(BuildContext context) {
     // Calculate compass ring rotation
     // The ring rotates so that North marker points to actual North
-    final ringRotation = widget.deviceHeading ?? 0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -145,16 +177,20 @@ class _CompassDialState extends State<CompassDial>
                 children: [
                   // 🔄 ROTATING Compass Ring (degree marks + N/E/S/W)
                   AnimatedRotation(
-                    turns: ringRotation / 360,
+                    turns: _totalRingTurns,
                     duration: const Duration(milliseconds: 600),
                     curve: Curves.easeOutCubic,
                     child: const _CompassRing(),
                   ),
 
-                  // 🎯 FIXED Qibla Needle (always points up/12 o'clock)
-                  _QiblaNeedle(
-                    qiblaDegrees: widget.qiblaDirection.degrees,
-                    isAligned: _isAligned,
+                  // 🎯 ROTATING Qibla Needle (points to Kaaba relative to heading)
+                  AnimatedRotation(
+                    turns: _totalNeedleTurns,
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    child: _QiblaNeedle(
+                      isAligned: _isAligned,
+                    ),
                   ),
 
                   // ⭐ Center Pivot
@@ -212,11 +248,6 @@ class _CompassDialState extends State<CompassDial>
             ),
           ],
         ),
-
-        const SizedBox(height: 30),
-
-        // 📍 Location Info Card
-        _LocationInfoCard(direction: widget.qiblaDirection),
       ],
     );
   }
@@ -303,11 +334,9 @@ class _CompassRing extends StatelessWidget {
 // ============================================================================
 
 class _QiblaNeedle extends StatelessWidget {
-  final double qiblaDegrees;
   final bool isAligned;
 
   const _QiblaNeedle({
-    required this.qiblaDegrees,
     required this.isAligned,
   });
 
@@ -319,28 +348,19 @@ class _QiblaNeedle extends StatelessWidget {
       child: Column(
         children: [
           // Kaaba Icon at tip
-          Container(
+          SizedBox(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: isAligned ? AppColors.celestialGold : AppColors.celestialGoldLight,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: (isAligned ? AppColors.celestialGlow : Colors.transparent),
-                  blurRadius: isAligned ? 20 : 10,
-                  spreadRadius: isAligned ? 3 : 0,
-                ),
-              ],
-            ),
             child: Icon(
               Icons.mosque,
-              color: isAligned ? Colors.white : AppColors.compassFace,
-              size: 24,
+              color: isAligned ? Colors.white : AppColors.celestialGold,
+              size: 32, // Slightly larger now that background is gone
+              shadows: isAligned ? [
+                const Shadow(
+                  color: AppColors.celestialGold,
+                  blurRadius: 20,
+                ),
+              ] : null,
             ),
           ),
           
@@ -360,7 +380,7 @@ class _QiblaNeedle extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
           ),
@@ -441,87 +461,6 @@ class _DirectionBadge extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-// ============================================================================
-// 📍 Location Info Card
-// ============================================================================
-
-class _LocationInfoCard extends StatelessWidget {
-  final QiblaDirection direction;
-
-  const _LocationInfoCard({required this.direction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: AppShapes.xlRadius,
-        border: Border.all(
-          color: AppColors.celestialGold.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: const BoxDecoration(
-              color: AppColors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.location_on,
-              color: AppColors.primaryFixed,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'QIBLA DIRECTION',
-                  style: AppTypography.label.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.outline,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  direction.formatted,
-                  style: AppTypography.headline.copyWith(
-                    fontSize: 20,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Calculated at ${_formatTime(direction.calculatedAt)}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.outlineVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatTime(DateTime time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
   }
 }
 

@@ -8,8 +8,6 @@ import '../../data/providers/chat_providers.dart';
 import '../states/chat_state.dart';
 import '../../../../core/network/connectivity_monitor.dart';
 import 'package:flutter/foundation.dart';
-// ignore: implementation_imports
-import 'package:realtime_client/src/types.dart';
 import '../../domain/entities/profile_entity.dart';
 
 part 'chat_viewmodel.g.dart';
@@ -126,7 +124,15 @@ class ChatViewModel extends _$ChatViewModel {
         
         state = state.copyWith(typingUsers: currentTyping);
       }
-    ).subscribe();
+    );
+
+    _typingChannel!.subscribe((status, [error]) {
+      if (status == RealtimeSubscribeStatus.channelError) {
+        debugPrint('⚠️ Typing channel error: $error. Potential timeout or permission issue.');
+      } else if (status == RealtimeSubscribeStatus.closed) {
+        debugPrint('🔌 Typing channel closed for $targetChatId');
+      }
+    });
   }
 
   Future<void> sendMessage(String content) async {
@@ -184,8 +190,7 @@ class ChatViewModel extends _$ChatViewModel {
   void startTyping() {
     // Memory-only broadcast via Supabase Realtime (does not touch Hive)
     final client = Supabase.instance.client;
-    client.channel('typing:${state.chatId}').send(
-      type: RealtimeListenTypes.broadcast,
+    client.channel('typing:${state.chatId}').sendBroadcastMessage(
       event: 'typing',
       payload: {'userId': client.auth.currentUser?.id, 'isTyping': true},
     );
@@ -193,8 +198,7 @@ class ChatViewModel extends _$ChatViewModel {
 
   void stopTyping() {
     final client = Supabase.instance.client;
-    client.channel('typing:${state.chatId}').send(
-      type: RealtimeListenTypes.broadcast,
+    client.channel('typing:${state.chatId}').sendBroadcastMessage(
       event: 'typing',
       payload: {'userId': client.auth.currentUser?.id, 'isTyping': false},
     );

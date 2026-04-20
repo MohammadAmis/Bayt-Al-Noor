@@ -4,7 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FileUploadService {
   final String bucketName;
-  static final Map<String, RealtimeChannel> _channels = {};
   FileUploadService({this.bucketName = 'community-resources'});
 
   Future<String> uploadWithProgress({
@@ -13,9 +12,7 @@ class FileUploadService {
     required String fileName,
     required StreamController<double> progressController,
   }) async {
-    final channel = Supabase.instance.client.channel('chat:$chatId');
     final file = File(filePath);
-    final extension = fileName.split('.').last.toLowerCase();
     final storagePath = '$chatId/${DateTime.now().millisecondsSinceEpoch}_$fileName';
 
     try {

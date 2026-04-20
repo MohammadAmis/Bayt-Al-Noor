@@ -15,6 +15,7 @@ class ProfileModel extends ProfileEntity {
     super.tasbihTotal,
     super.tasbihStreak,
     super.lastTasbihDate,
+    super.tasbihHistory,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +37,7 @@ class ProfileModel extends ProfileEntity {
       lastTasbihDate: json['last_tasbih_date'] != null 
           ? DateTime.parse(json['last_tasbih_date'] as String) 
           : null,
+      tasbihHistory: Map<String, int>.from(json['tasbih_history'] as Map? ?? {}),
     );
   }
 
@@ -54,6 +56,7 @@ class ProfileModel extends ProfileEntity {
       tasbihTotal: entity.tasbihTotal,
       tasbihStreak: entity.tasbihStreak,
       lastTasbihDate: entity.lastTasbihDate,
+      tasbihHistory: entity.tasbihHistory,
     );
   }
 
@@ -72,6 +75,7 @@ class ProfileModel extends ProfileEntity {
       'tasbih_total': tasbihTotal,
       'tasbih_streak': tasbihStreak,
       'last_tasbih_date': lastTasbihDate?.toIso8601String(),
+      'tasbih_history': tasbihHistory,
     };
   }
 

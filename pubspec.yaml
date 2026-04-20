@@ -65,6 +65,8 @@ dependencies:
   path_provider: ^2.1.5
   go_router: ^14.6.0
   collection: ^1.18.0
+  sensors_plus: ^7.0.0
+  just_audio: 0.9.43
   
 
 dev_dependencies:
@@ -90,6 +92,7 @@ flutter:
     - assets/reflection_verse.png
     - assets/logo_kufic.png
     - assets/logo_2.png
+    - assets/sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

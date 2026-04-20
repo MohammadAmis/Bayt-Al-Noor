@@ -90,7 +90,9 @@ class NotificationService {
           icon: '@mipmap/ic_launcher',
           enableVibration: true,
           playSound: enableSound,
-          sound: enableSound ? const RawResourceAndroidNotificationSound('notification') : null,
+          // 🔔 Using system default sound to avoid crashes if 'notification.wav' is missing in res/raw.
+          // To use a custom sound, place 'notification.wav' in android/app/src/main/res/raw/
+          sound: null, 
         ),
         iOS: DarwinNotificationDetails(
           presentAlert: true,

@@ -16,6 +16,7 @@ class ProfileEntity {
   final int tasbihTotal;
   final int tasbihStreak;
   final DateTime? lastTasbihDate;
+  final Map<String, int> tasbihHistory;
 
   const ProfileEntity({
     required this.id,
@@ -31,6 +32,7 @@ class ProfileEntity {
     this.tasbihTotal = 0,
     this.tasbihStreak = 0,
     this.lastTasbihDate,
+    this.tasbihHistory = const {},
   });
 
   @override

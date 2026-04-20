@@ -19,7 +19,6 @@ class ChatInfoViewModel extends _$ChatInfoViewModel {
   Future<void> loadMembers() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final repo = ref.read(chatRepositoryProvider);
       // In production: repo.getChatMembers(chatId)
       final members = await _mockFetchMembers(); 
       state = state.copyWith(members: members, isLoading: false);

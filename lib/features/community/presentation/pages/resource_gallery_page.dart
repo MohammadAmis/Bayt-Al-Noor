@@ -71,7 +71,7 @@ class ResourceGalleryPage extends ConsumerWidget {
   Future<void> _pickAndUpload(BuildContext context, ResourceViewModel notifier) async {
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
-    if (file == null) return;
+    if (file == null || !context.mounted) return;
 
     showDialog(
       context: context,

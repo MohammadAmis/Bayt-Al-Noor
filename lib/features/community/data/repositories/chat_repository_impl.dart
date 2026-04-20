@@ -465,6 +465,7 @@ class ChatRepositoryImpl implements ChatRepository {
     return _remote.findExistingPrivateChat(otherUserId);
   }
 
+  @override
   Future<void> clearLocalData() async {
     await _local.clearAllData();
     _offlineQueue.clear();
@@ -482,14 +483,16 @@ class ChatRepositoryImpl implements ChatRepository {
     debugPrint('📡 Starting Global Membership Observer for: $myId');
     
     // We listen for NEW memberships added to the current user
+    // Added resiliency: ignore errors to prevent crashing the stream-based UI
     final sub = Supabase.instance.client
         .from('chat_members')
         .stream(primaryKey: ['chat_id', 'user_id'])
         .eq('user_id', myId)
         .listen((data) {
-          // This stream emits the full list of memberships every time it changes.
-          // We check for IDs we don't have in Hive yet.
           unawaited(_reconcileMemberships(data));
+        }, onError: (err) {
+          debugPrint('⚠️ Global Membership Observer Error: $err');
+          // No action needed, stream will eventually reconnect
         });
 
     _syncSubscriptions[subscriptionKey] = sub;

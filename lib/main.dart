@@ -120,5 +120,4 @@ class NamazTimerApp extends ConsumerWidget {
   }
 }
 
-// Global Navigator Key for context-less navigation if needed
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+

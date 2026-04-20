@@ -17,7 +17,6 @@ class MemberListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAdminView = member.role == 'owner' || member.role == 'admin';
     
     return ListTile(
       leading: CircleAvatar(
