@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
-import 'quran_reading_page.dart';
-import 'zakat_calculator_page.dart';
+import '../../../quran/presentation/pages/quran_reading_page.dart';
+import '../../../zakat/presentation/pages/zakat_calculator_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../tasbih/presentation/pages/tasbih_page.dart';
 
 class DeenHubPage extends StatelessWidget {
   const DeenHubPage({super.key});
@@ -105,8 +106,6 @@ class _DeenSearchBar extends StatelessWidget {
   }
 }
 
-
-
 class _EssentialPillars extends StatelessWidget {
   const _EssentialPillars();
 
@@ -159,11 +158,15 @@ class _EssentialPillars extends StatelessWidget {
             children: [
               Expanded(
                 child: _PillarCard(
-                  title: 'Dhikr',
+                  title: 'Tasbih',
                   desc: 'Remembrance',
                   icon: Icons.fingerprint_rounded,
                   accentColor: AppColors.taupe,
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const TasbihPage()),
+                  ),
+                  isFeatured: true,
                 ),
               ),
               const SizedBox(width: 12),

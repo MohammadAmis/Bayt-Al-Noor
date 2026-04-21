@@ -4,14 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/secrets.dart';
 import 'core/design_tokens.dart';
-import 'features/splash/presentation/pages/splash_screen_page.dart';
-import 'features/home/presentation/pages/main_navigation_container.dart';
-import 'features/settings/presentation/pages/settings_page.dart';
-import 'features/auth/presentation/pages/login_page.dart';
-import 'features/auth/presentation/pages/register_page.dart';
-import 'features/auth/presentation/pages/otp_verification_page.dart';
-import 'features/auth/presentation/pages/forgot_password_page.dart';
-import 'features/auth/presentation/pages/new_password_page.dart';
+import 'app/router.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'core/utils/app_lifecycle_notifier.dart';
@@ -58,7 +51,8 @@ class NamazTimerApp extends ConsumerWidget {
     // ✅ Activate orchestrator to start listening for setting changes
     ref.watch(notificationOrchestratorProvider);
     
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: 'Bayt-Al-Noor',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -101,20 +95,11 @@ class NamazTimerApp extends ConsumerWidget {
           ),
         ),
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreenPage(),
-        '/main': (context) => const MainNavigationContainer(),
-        '/settings': (context) => const SettingsPage(),
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/otp-verification': (context) => const OtpVerificationPage(),
-        '/forgot-password': (context) => const ForgotPasswordPage(),
-        '/new-password': (context) => const NewPasswordPage(),
-      },
-      onUnknownRoute: (settings) {
-        return MaterialPageRoute(
-            builder: (context) => const SplashScreenPage());
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+          child: child!,
+        );
       },
     );
   }

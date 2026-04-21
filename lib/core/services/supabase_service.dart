@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../features/community/domain/repositories/chat_repository.dart';
-import '../../features/community/data/models/profile_model.dart';
+import '../../features/circle/domain/repositories/chat_repository.dart';
+import '../../features/circle/data/models/profile_model.dart';
 
 class SupabaseService {
   static final SupabaseService instance = SupabaseService._internal();

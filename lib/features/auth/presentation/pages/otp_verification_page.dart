@@ -1,11 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
 
 class OtpVerificationPage extends StatefulWidget {
-  const OtpVerificationPage({super.key});
+  final String? email;
+  final bool isRecovery;
+
+  const OtpVerificationPage({
+    super.key,
+    this.email,
+    this.isRecovery = false,
+  });
 
   @override
   State<OtpVerificationPage> createState() => _OtpVerificationPageState();
@@ -63,16 +71,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   Future<void> _handleVerify() async {
-    final args = ModalRoute.of(context)!.settings.arguments;
-    String? email;
-    bool isRecovery = false;
-
-    if (args is String) {
-      email = args;
-    } else if (args is Map<String, dynamic>) {
-      email = args['email'];
-      isRecovery = args['isRecovery'] ?? false;
-    }
+    final email = widget.email;
+    final isRecovery = widget.isRecovery;
 
     final otp = _controllers.map((c) => c.text).join();
 
@@ -96,9 +96,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
       if (mounted) {
         if (isRecovery) {
-          Navigator.pushReplacementNamed(context, '/new-password');
+          context.goNamed('new_password');
         } else {
-          Navigator.pushReplacementNamed(context, '/main');
+          context.go('/home');
         }
       }
     } on AuthException catch (e) {
@@ -119,10 +119,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   Future<void> _handleResend() async {
-    final args = ModalRoute.of(context)!.settings.arguments;
-    String? email;
-    if (args is String) email = args;
-    if (args is Map<String, dynamic>) email = args['email'];
+    final email = widget.email;
 
     if (email == null) return;
 
@@ -152,10 +149,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments;
-    String email = 'your email';
-    if (args is String) email = args;
-    if (args is Map<String, dynamic>) email = args['email'] ?? 'your email';
+    final email = widget.email ?? 'your email';
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -256,7 +250,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.arrow_back),
             style: IconButton.styleFrom(backgroundColor: AppColors.surfaceContainerHigh.withValues(alpha:0.5)),
           ),

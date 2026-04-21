@@ -8,7 +8,6 @@ import '../../../../../core/design_tokens.dart';
 import '../../../../../core/widgets/common_widgets.dart';
 
 // ✅ Local widgets
-import '../../../profile/presentation/pages/profile_page.dart';
 import '../providers/qibla_provider.dart';
 import '../widgets/compass_dial.dart';
 import '../widgets/location_card.dart';
@@ -68,20 +67,9 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
         title: 'Qibla',
-        isMainScreen: true,
+        isMainScreen: false,
         location: 'Qibla Finder',
         onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
-        onProfilePressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const UserProfilePage(
-              name: 'Fatima Al-Sayed',
-              avatarUrl:
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y',
-              bio: 'Seeking tranquility through reflection and prayer.',
-            ),
-          ),
-        ),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -110,10 +98,11 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                   if (context.mounted) {
                     final now = DateTime.now();
                     // 🛡️ Cooldown: Don't show again for at least 10 seconds to avoid spam
-                    if (_lastSnackbarTime == null || 
-                        now.difference(_lastSnackbarTime!) > const Duration(seconds: 10)) {
+                    if (_lastSnackbarTime == null ||
+                        now.difference(_lastSnackbarTime!) >
+                            const Duration(seconds: 10)) {
                       _lastSnackbarTime = now;
-                      
+
                       // 🚀 Post-frame execution to avoid "showSnackBar called during build" crash
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (mounted) {
@@ -165,8 +154,7 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
                 },
                 icon: const Icon(Icons.edit_location, size: 18),
                 label: const Text('Enter Location Manually'),
-                style:
-                    TextButton.styleFrom(foregroundColor: AppColors.primary),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
               ),
             ],
             const SizedBox(height: 120), // Bottom spacing for FAB
@@ -182,16 +170,6 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Text(
-          'CELESTIAL ALIGNMENT',
-          style: AppTypography.label.copyWith(
-            color: AppColors.secondary,
-            fontSize: 10,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2.5,
-          ),
-        ),
-        const SizedBox(height: 8),
         Text(
           'Qibla Direction',
           style: AppTypography.headline.copyWith(

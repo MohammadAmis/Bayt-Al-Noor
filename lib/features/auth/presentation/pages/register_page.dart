@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
@@ -69,10 +70,9 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Verification code sent to your email!')),
         );
-        Navigator.pushReplacementNamed(
-          context, 
-          '/otp-verification', 
-          arguments: {'email': email, 'isRecovery': false},
+        context.pushNamed(
+          'otp_verification', 
+          extra: {'email': email, 'isRecovery': false},
         );
       }
     } on AuthException catch (e) {
@@ -302,7 +302,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.maybePop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
           ),
           const SizedBox(width: 8),
@@ -414,7 +414,7 @@ class _RegisterPageState extends State<RegisterPage> {
           Text('Already have an account?', style: AppTypography.body.copyWith(color: AppColors.onSurfaceVariant, fontWeight: FontWeight.w500)),
           const SizedBox(height: 12),
           TextButton.icon(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+            onPressed: () => context.go('/login'),
             icon: const Icon(Icons.chevron_right, size: 18),
             label: const Text('Login to your sanctuary'),
             style: TextButton.styleFrom(foregroundColor: AppColors.primary, textStyle: AppTypography.label.copyWith(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),

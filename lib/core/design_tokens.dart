@@ -107,6 +107,30 @@ class AppColors {
   static const Color quranOutline = Color(0xFF83746F);
   static const Color quranOnSecondaryContainer = Color(0xFF795A4C);
   static const Color quranPrimaryFixedDim = Color(0xFFEDBBAB);
+  
+  // 🌌 Celestial/Emerald Theme (For Shorts & Discovery)
+  static const Color emeraldBg = Color(0xFF041329);
+  static const Color emeraldPrimary = Color(0xFF8BD6B6);
+  static const Color emeraldPrimaryContainer = Color(0xFF065F46);
+  static const Color emeraldOnPrimary = Color(0xFF003828);
+  static const Color emeraldSecondary = Color(0xFFE9C349);
+  static const Color emeraldOnSecondary = Color(0xFF3C2F00);
+  static const Color emeraldSurface = Color(0xFF112036);
+  static const Color emeraldOnSurface = Color(0xFFD6E3FF);
+  static const Color emeraldOutline = Color(0xFF3F4944);
+
+  static const LinearGradient emeraldGradient = LinearGradient(
+    colors: [Color(0xFF8BD6B6), Color(0xFF065F46)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient shortsOverlayGradient = LinearGradient(
+    colors: [Colors.transparent, emeraldBg],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: [0.3, 1.0],
+  );
 
   /// ✅ Returns a premium multi-stop gradient based on the prayer name
   static LinearGradient getPrayerGradient(String prayerName) {

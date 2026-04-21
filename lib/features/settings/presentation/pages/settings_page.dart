@@ -12,7 +12,7 @@ import '../dialogs/calculation_method_dialog.dart';
 import '../dialogs/location_input_dialog.dart';
 import '../../providers/location_providers.dart';
 import '../../../../../core/providers/app_preferences_provider.dart';
-import '../../../community/data/providers/chat_providers.dart';
+import '../../../circle/data/providers/chat_providers.dart';
 import '../widgets/rescheduling_status_banner.dart';
 
 class SettingsPage extends ConsumerWidget {

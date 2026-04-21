@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/design_tokens.dart';
 
@@ -41,10 +42,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         );
         
         // Navigate to OTP verification with recovery context
-        Navigator.pushNamed(
-          context, 
-          '/otp-verification', 
-          arguments: {
+        context.pushNamed(
+          'otp_verification', 
+          extra: {
             'email': email,
             'isRecovery': true,
           },
@@ -108,7 +108,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         icon: const Icon(Icons.arrow_back),
                         style: IconButton.styleFrom(
                           hoverColor: AppColors.surfaceContainerHigh.withValues(alpha:0.5),

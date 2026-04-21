@@ -11,7 +11,7 @@ class PrayerService {
   PrayerService._internal();
 
   /// Fetches the user's current coordinates.
-  /// Falls back to Supabase profile or London if GPS is unavailable.
+  /// Falls back to Supabase profile or Mumbai if GPS is unavailable.
   Future<Position?> getCurrentPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -34,7 +34,7 @@ class PrayerService {
   Future<PrayerTimes> getPrayerTimes({
     double? latitude,
     double? longitude,
-    CalculationMethod method = CalculationMethod.muslim_world_league,
+    CalculationMethod method = CalculationMethod.karachi,
     Madhab madhab = Madhab.hanafi,
   }) async {
     final coordinates = Coordinates(
@@ -113,6 +113,8 @@ class PrayerService {
   /// Helper to map Supabase string preferences to Adhan enums.
   CalculationMethod parseCalculationMethod(String? method) {
     switch (method) {
+      case 'KARACHI':
+        return CalculationMethod.karachi;
       case 'MWL':
         return CalculationMethod.muslim_world_league;
       case 'ISNA':
@@ -121,8 +123,6 @@ class PrayerService {
         return CalculationMethod.egyptian;
       case 'UMM_AL_QURA':
         return CalculationMethod.umm_al_qura;
-      case 'KARACHI':
-        return CalculationMethod.karachi;
       default:
         return CalculationMethod.karachi;
     }

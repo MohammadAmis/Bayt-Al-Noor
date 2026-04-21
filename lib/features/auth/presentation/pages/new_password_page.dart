@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/design_tokens.dart';
 
@@ -59,7 +60,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account secured successfully!')),
         );
-        Navigator.pushReplacementNamed(context, '/main');
+        context.go('/home');
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -119,7 +120,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         icon: const Icon(Icons.arrow_back),
                         style: IconButton.styleFrom(
                           hoverColor: AppColors.surfaceContainerHigh.withValues(alpha:0.5),
@@ -192,7 +193,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                              onTap: () => context.go('/login'),
                               child: Text(
                                 'Sign In',
                                 style: AppTypography.body.copyWith(

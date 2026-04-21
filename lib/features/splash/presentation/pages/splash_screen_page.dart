@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/design_tokens.dart';
 import 'dart:math' as math;
@@ -77,10 +78,10 @@ class _SplashScreenPageState extends State<SplashScreenPage>
 
     if (session != null) {
       // User is logged in, navigate to Home
-      Navigator.pushReplacementNamed(context, '/main');
+      context.go('/home');
     } else {
       // User is not logged in, navigate to Login
-      Navigator.pushReplacementNamed(context, '/login');
+      context.go('/login');
     }
   }
 

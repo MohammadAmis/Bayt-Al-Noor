@@ -1,6 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../design_tokens.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../features/settings/providers/location_providers.dart';
+import '../../features/settings/providers/settings_providers.dart';
 
 class GlassContainer extends StatelessWidget {
   final Widget child;
@@ -204,7 +209,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     IconButton(
                       onPressed: onSettingsPressed,
                       icon: const Icon(Icons.settings_outlined,
-                          size: 22, color: AppColors.primary),
+                      size: 22, 
+                      color: AppColors.primary),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -239,4 +245,146 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(64);
+}
+
+class MainNavigationContainer extends ConsumerStatefulWidget {
+  final StatefulNavigationShell navigationShell;
+
+  const MainNavigationContainer({
+    super.key,
+    required this.navigationShell,
+  });
+
+  @override
+  ConsumerState<MainNavigationContainer> createState() =>
+      _MainNavigationContainerState();
+}
+
+class _MainNavigationContainerState
+    extends ConsumerState<MainNavigationContainer> {
+  @override
+  void initState() {
+    super.initState();
+    // Prompt for location permission on first entry if auto-detect is enabled
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkLocationPermissions();
+    });
+  }
+
+  Future<void> _checkLocationPermissions() async {
+    final useAuto = ref.read(useAutoLocationProvider);
+    if (!useAuto) return;
+
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        // Request permission
+        final result = await Geolocator.requestPermission();
+        if (result == LocationPermission.whileInUse ||
+            result == LocationPermission.always) {
+          // Refresh location if granted
+          ref.read(locationManagerProvider.notifier).refresh();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking location permissions: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      body: widget.navigationShell,
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return Container(
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 24, top: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceBright.withValues(alpha: 0.95),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: GlassContainer(
+        blur: 20,
+        color: Colors.transparent,
+        border: Border.all(color: Colors.transparent),
+        borderRadius: AppShapes.fullRadius,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(Icons.home, 'Home', 0),
+            _buildNavItem(Icons.mosque, 'Deen', 1),
+            _buildNavItem(Icons.explore, 'Qibla', 2),
+            _buildNavItem(Icons.add_box, 'Create', 3),
+            _buildNavItem(Icons.video_library, 'Shorts', 4),
+            _buildNavItem(Icons.hub_outlined, 'Circle', 5),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    bool isActive = widget.navigationShell.currentIndex == index;
+
+    return GestureDetector(
+      onTap: () => widget.navigationShell.goBranch(
+        index,
+        initialLocation: index == widget.navigationShell.currentIndex,
+      ),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: AppAnimations.normal,
+        padding:
+            EdgeInsets.symmetric(horizontal: isActive ? 16 : 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary : Colors.transparent,
+          borderRadius: AppShapes.fullRadius,
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isActive
+                  ? Colors.white
+                  : AppColors.primary.withValues(alpha: 0.5),
+              size: 20,
+            ),
+            if (isActive) ...[
+              const SizedBox(width: 8),
+              Text(
+                label.toUpperCase(),
+                style: AppTypography.label.copyWith(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }

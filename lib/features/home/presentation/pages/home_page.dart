@@ -17,7 +17,6 @@ import '../../../prayer_times/providers/active_window_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../features/settings/providers/location_providers.dart';
 
-
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -26,8 +25,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  
-
   @override
   void initState() {
     super.initState();
@@ -55,11 +52,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       error: (error, stack) {
         final errorString = error.toString().toLowerCase();
-        final isLocationError = errorString.contains('location') || 
-                                errorString.contains('permission');
-        final isNetworkError = errorString.contains('socket') ||
-                               errorString.contains('timeout');
-        
+        final isLocationError = errorString.contains('location') ||
+            errorString.contains('permission');
+        final isNetworkError =
+            errorString.contains('socket') || errorString.contains('timeout');
+
         return Scaffold(
           body: Center(
             child: Padding(
@@ -68,22 +65,33 @@ class _HomePageState extends ConsumerState<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    isLocationError ? Icons.location_off_rounded : 
-                    isNetworkError ? Icons.wifi_off_rounded : Icons.error_outline_rounded,
-                    color: AppColors.error, size: 56),
+                      isLocationError
+                          ? Icons.location_off_rounded
+                          : isNetworkError
+                              ? Icons.wifi_off_rounded
+                              : Icons.error_outline_rounded,
+                      color: AppColors.error,
+                      size: 56),
                   const SizedBox(height: 16),
                   Text(
-                    isLocationError ? 'Location Access Required' :
-                    isNetworkError ? 'Connection Issue' : 'Unable to Load Prayer Times',
-                    style: AppTypography.title.copyWith(color: AppColors.onSurface),
+                    isLocationError
+                        ? 'Location Access Required'
+                        : isNetworkError
+                            ? 'Connection Issue'
+                            : 'Unable to Load Prayer Times',
+                    style: AppTypography.title
+                        .copyWith(color: AppColors.onSurface),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    isLocationError ? 'Enable location services in Settings to get accurate prayer times.' :
-                    isNetworkError ? 'Check your internet connection and try again.' :
-                    'Please try again in a moment.',
-                    style: AppTypography.body.copyWith(color: AppColors.onSurfaceVariant),
+                    isLocationError
+                        ? 'Enable location services in Settings to get accurate prayer times.'
+                        : isNetworkError
+                            ? 'Check your internet connection and try again.'
+                            : 'Please try again in a moment.',
+                    style: AppTypography.body
+                        .copyWith(color: AppColors.onSurfaceVariant),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -94,7 +102,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.onPrimary,
-                      shape: RoundedRectangleBorder(borderRadius: AppShapes.fullRadius),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: AppShapes.fullRadius),
                     ),
                   ),
                   if (isLocationError) ...[
@@ -103,7 +112,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                       onPressed: () => Geolocator.openLocationSettings(),
                       icon: const Icon(Icons.settings_rounded),
                       label: const Text('Open Settings'),
-                      style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                      style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primary),
                     ),
                   ],
                 ],
@@ -155,15 +165,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                   if (!isConnected)
                     Container(
                       color: AppColors.tertiaryContainer,
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.offline_bolt_rounded, size: 16, color: AppColors.onTertiaryContainer),
+                          const Icon(Icons.offline_bolt_rounded,
+                              size: 16, color: AppColors.onTertiaryContainer),
                           const SizedBox(width: 8),
                           Text(
                             'Offline mode - showing cached times',
-                            style: AppTypography.label.copyWith(color: AppColors.onTertiaryContainer),
+                            style: AppTypography.label
+                                .copyWith(color: AppColors.onTertiaryContainer),
                           ),
                         ],
                       ),
@@ -188,7 +201,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                         PrayerStatusCard(
                           nextPrayerName: upcomingPrayerName,
                           nextPrayer: nextPrayer,
-                          prayerTime: data.prayerTimes.timeForPrayer(nextPrayer) ?? DateTime.now(),
+                          prayerTime:
+                              data.prayerTimes.timeForPrayer(nextPrayer) ??
+                                  DateTime.now(),
                           showNotificationToggle: true,
                         ),
 
@@ -226,7 +241,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     // _myController.dispose();
     super.dispose();
   }
-  
+
   String _getPrayerDisplayName(Prayer prayer) {
     switch (prayer) {
       case Prayer.fajr:

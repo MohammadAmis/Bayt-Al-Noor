@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/main');
+        context.go('/home');
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.maybePop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface, size: 24),
           ),
           const SizedBox(width: 12),
@@ -199,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   _buildInputLabel('Password'),
                   GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/forgot-password'),
+                    onTap: () => context.pushNamed('forgot_password'),
                     child: Text('Forgot Password?', style: AppTypography.label.copyWith(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
                   ),
                 ],
@@ -297,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text("Don't have an account? ", style: AppTypography.body.copyWith(color: AppColors.onSurfaceVariant, fontSize: 14)),
         GestureDetector(
-          onTap: () => Navigator.pushNamed(context, '/register'),
+          onTap: () => context.pushNamed('register'),
           child: Text('Register', style: AppTypography.body.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14)),
         ),
       ],
