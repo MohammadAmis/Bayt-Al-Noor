@@ -1,5 +1,5 @@
+import 'package:bayt_al_noor/core/providers/services_provider.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/services/supabase_service.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -377,7 +377,7 @@ class SettingsPage extends ConsumerWidget {
   void _handleLogout(BuildContext context, WidgetRef ref) async {
     try {
       final repo = ref.read(chatRepositoryProvider);
-      await SupabaseService.instance.signOut(repo);
+      await ref.read(supabaseServiceProvider).signOut(repo);
       if (context.mounted) {
         // Clear navigation stack and go to login
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);

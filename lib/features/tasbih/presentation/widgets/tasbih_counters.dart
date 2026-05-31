@@ -10,6 +10,8 @@ class ModernOrbCounter extends StatelessWidget {
   final VoidCallback onTap;
   final Animation<double> pulseAnimation;
 
+  final TasbihService service;
+
   const ModernOrbCounter({
     super.key,
     required this.count,
@@ -17,6 +19,7 @@ class ModernOrbCounter extends StatelessWidget {
     required this.dhikr,
     required this.onTap,
     required this.pulseAnimation,
+    required this.service,
   });
 
   @override
@@ -80,7 +83,7 @@ class ModernOrbCounter extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (TasbihService.instance.languageMode == LanguageMode.arabic)
+                        if (service.languageMode == LanguageMode.arabic)
                           Text(
                             dhikr.arabic,
                             style: AppTypography.headline.copyWith(
@@ -90,7 +93,7 @@ class ModernOrbCounter extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                        if (TasbihService.instance.languageMode == LanguageMode.english)
+                        if (service.languageMode == LanguageMode.english)
                            Text(
                             dhikr.transliteration,
                             style: AppTypography.title.copyWith(
@@ -100,8 +103,8 @@ class ModernOrbCounter extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                        if (TasbihService.instance.languageMode == LanguageMode.arabic || 
-                            TasbihService.instance.languageMode == LanguageMode.english)
+                        if (service.languageMode == LanguageMode.arabic || 
+                            service.languageMode == LanguageMode.english)
                           const SizedBox(height: 16),
                         Text(
                           '$count',
@@ -154,12 +157,15 @@ class ClassicBeadsCounter extends StatefulWidget {
   final Dhikr dhikr;
   final VoidCallback onTap;
 
+  final TasbihService service;
+
   const ClassicBeadsCounter({
     super.key,
     required this.count,
     required this.goal,
     required this.dhikr,
     required this.onTap,
+    required this.service,
   });
 
   @override
@@ -273,7 +279,7 @@ class _ClassicBeadsCounterState extends State<ClassicBeadsCounter> with SingleTi
             ),
 
             // Dhikr Label
-             if (TasbihService.instance.languageMode == LanguageMode.arabic)
+             if (widget.service.languageMode == LanguageMode.arabic)
                Positioned(
                  top: 40,
                  child: Text(
@@ -285,7 +291,7 @@ class _ClassicBeadsCounterState extends State<ClassicBeadsCounter> with SingleTi
                    ),
                  ),
                ),
-             if (TasbihService.instance.languageMode == LanguageMode.english)
+             if (widget.service.languageMode == LanguageMode.english)
                Positioned(
                  top: 40,
                  child: Text(
@@ -358,11 +364,14 @@ class DhikrCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
+  final TasbihService service;
+
   const DhikrCard({
     super.key,
     required this.dhikr,
     required this.isSelected,
     required this.onTap,
+    required this.service,
   });
 
   @override
@@ -393,7 +402,7 @@ class DhikrCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (TasbihService.instance.languageMode == LanguageMode.arabic)
+            if (service.languageMode == LanguageMode.arabic)
               Text(
                 dhikr.arabic,
                 style: AppTypography.headline.copyWith(
@@ -403,8 +412,8 @@ class DhikrCard extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-            if (TasbihService.instance.languageMode == LanguageMode.english) ...[
-              if (TasbihService.instance.isTransliterationVisible)
+            if (service.languageMode == LanguageMode.english) ...[
+              if (service.isTransliterationVisible)
                 Text(
                   dhikr.transliteration,
                   style: AppTypography.body.copyWith(
@@ -414,7 +423,7 @@ class DhikrCard extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              if (TasbihService.instance.isTranslationVisible)
+              if (service.isTranslationVisible)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(

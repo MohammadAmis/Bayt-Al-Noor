@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:adhan/adhan.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../widgets/prayer_status_card.dart';
-import '../../../profile/presentation/pages/profile_page.dart';
 import '../widgets/milestone_grid.dart';
 import '../widgets/real_time_prayer_clock.dart';
 import '../widgets/current_prayer_header.dart';
@@ -132,23 +132,20 @@ class _HomePageState extends ConsumerState<HomePage> {
           extendBody: true,
           backgroundColor: AppColors.surface,
           appBar: AppTopBar(
-            title: 'Bayt Al-Noor',
             isMainScreen: true,
             location: locationAsync.maybeWhen(
               data: (loc) => loc?.displayAddress ?? 'Unknown',
-              orElse: () => data.cityName.toUpperCase(),
+              orElse: () => data.cityName,
             ),
-            onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
-            onProfilePressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserProfilePage(
-                  name: currentUser?.userMetadata?['full_name'] ?? 'Guest',
-                  avatarUrl: currentUser?.userMetadata?['avatar_url'] ??
-                      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-                  bio: 'Seeking tranquility through reflection and prayer.',
-                ),
-              ),
+            onProfilePressed: () => context.push(
+              '/profile',
+              extra: {
+                'name': currentUser?.userMetadata?['full_name'] ?? 'Guest',
+                'avatarUrl': currentUser?.userMetadata?['avatar_url'] ??
+                'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
+                'bio': 'Seeking tranquility through reflection and prayer.',
+                'userId': currentUser?.id,
+              },
             ),
           ),
           body: RefreshIndicator(

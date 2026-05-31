@@ -9,6 +9,7 @@ import '../states/chat_state.dart';
 import '../../../../core/network/connectivity_monitor.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/profile_entity.dart';
+import 'package:image_picker/image_picker.dart';
 
 part 'chat_viewmodel.g.dart';
 
@@ -135,7 +136,7 @@ class ChatViewModel extends _$ChatViewModel {
     });
   }
 
-  Future<void> sendMessage(String content) async {
+  Future<void> sendMessage(String content, {String? replyToMessageId}) async {
     if (content.trim().isEmpty) return;
 
     final currentUser = Supabase.instance.client.auth.currentUser;
@@ -176,6 +177,7 @@ class ChatViewModel extends _$ChatViewModel {
       createdAt: DateTime.now(),
       status: MessageStatus.sending,
       isMine: true,
+      replyToMessageId: replyToMessageId?.startsWith('temp_') == true ? null : replyToMessageId,
     );
 
     try {
@@ -204,9 +206,13 @@ class ChatViewModel extends _$ChatViewModel {
     );
   }
 
-  Future<void> sendImageMessage(String filePath, {String? caption}) async {
+  Future<void> sendImageMessage(dynamic fileData, {String? caption, String? replyToMessageId}) async {
     final currentUser = Supabase.instance.client.auth.currentUser;
     if (currentUser == null) return;
+    
+    // We only support XFile now
+    if (fileData is! XFile) return;
+    final xFile = fileData;
 
     final repo = ref.read(chatRepositoryProvider);
     final uploadService = ref.read(fileUploadServiceProvider);
@@ -229,16 +235,14 @@ class ChatViewModel extends _$ChatViewModel {
       }
     }
 
-    final fileName = filePath.split('/').last;
     final progressController = StreamController<double>();
 
     // We don't block the UI for the full upload, but we show a 'sending' status if possible
     // For now, we perform the upload and then send the message
     try {
-      final publicUrl = await uploadService.uploadWithProgress(
-        filePath: filePath,
+      final publicUrl = await uploadService.uploadXFile(
+        xFile: xFile,
         chatId: targetChatId,
-        fileName: fileName,
         progressController: progressController,
       );
 
@@ -252,6 +256,7 @@ class ChatViewModel extends _$ChatViewModel {
         status: MessageStatus.sending,
         isMine: true,
         resourceUrl: publicUrl,
+        replyToMessageId: replyToMessageId?.startsWith('temp_') == true ? null : replyToMessageId,
       );
 
       await repo.sendMessage(targetChatId, msg);
@@ -259,6 +264,56 @@ class ChatViewModel extends _$ChatViewModel {
       state = state.copyWith(error: 'Image upload failed');
     } finally {
       progressController.close();
+    }
+  }
+
+  Future<void> deleteMessage(String messageId) async {
+    final repo = ref.read(chatRepositoryProvider);
+    try {
+      // Optimistic UI removal
+      final newMessages = state.messages.where((m) => m.id != messageId).toList();
+      state = state.copyWith(messages: newMessages);
+      
+      await repo.deleteMessage(messageId);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to delete message');
+    }
+  }
+
+  Future<void> reactToMessage(String messageId, String emoji) async {
+    final repo = ref.read(chatRepositoryProvider);
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    if (currentUser == null) return;
+    
+    final msgIndex = state.messages.indexWhere((m) => m.id == messageId);
+    if (msgIndex == -1) return;
+    
+    final msg = state.messages[msgIndex];
+    final currentReactions = Map<String, List<String>>.from(msg.reactions ?? {});
+    
+    final usersForEmoji = List<String>.from(currentReactions[emoji] ?? []);
+    if (usersForEmoji.contains(currentUser.id)) {
+      usersForEmoji.remove(currentUser.id);
+      if (usersForEmoji.isEmpty) {
+        currentReactions.remove(emoji);
+      } else {
+        currentReactions[emoji] = usersForEmoji;
+      }
+    } else {
+      usersForEmoji.add(currentUser.id);
+      currentReactions[emoji] = usersForEmoji;
+    }
+
+    // Optimistic UI update
+    final updatedMsg = msg.copyWith(reactions: currentReactions);
+    final newMessages = List<MessageEntity>.from(state.messages);
+    newMessages[msgIndex] = updatedMsg;
+    state = state.copyWith(messages: newMessages);
+
+    try {
+      await repo.reactToMessage(state.chatId, messageId, currentReactions);
+    } catch (e) {
+      debugPrint('Failed to react: $e');
     }
   }
 }

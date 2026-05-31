@@ -93,6 +93,7 @@ class _DhikrCarouselState extends State<DhikrCarousel> {
                   dhikr: widget.service.dhikrs[index],
                   isSelected: widget.service.selectedDhikrIndex == index,
                   onTap: () => widget.service.selectDhikr(index),
+                  service: widget.service,
                 ),
               );
             }),

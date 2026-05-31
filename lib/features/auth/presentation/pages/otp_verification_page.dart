@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
 
-class OtpVerificationPage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/services_provider.dart';
+
+class OtpVerificationPage extends ConsumerStatefulWidget {
   final String? email;
   final bool isRecovery;
 
@@ -16,10 +18,10 @@ class OtpVerificationPage extends StatefulWidget {
   });
 
   @override
-  State<OtpVerificationPage> createState() => _OtpVerificationPageState();
+  ConsumerState<OtpVerificationPage> createState() => _OtpVerificationPageState();
 }
 
-class _OtpVerificationPageState extends State<OtpVerificationPage> {
+class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   // Support 8 digits as received in Supabase email
   final List<TextEditingController> _controllers = List.generate(8, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(8, (index) => FocusNode());
@@ -88,7 +90,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     setState(() => _isLoading = true);
 
     try {
-      await SupabaseService.instance.verifyOtp(
+      await ref.read(supabaseServiceProvider).verifyOtp(
         type: isRecovery ? OtpType.recovery : OtpType.signup,
         email: email,
         token: otp,
@@ -129,7 +131,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     });
 
     try {
-      await SupabaseService.instance.signInWithOtp(email: email);
+      await ref.read(supabaseServiceProvider).signInWithOtp(email: email);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('A new code has been sent to your email')),

@@ -298,8 +298,16 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<void> reactToMessage(String chatId, String messageId, Map<String, List<String>> newReactions) async {
+    // Optimistic local update
+    await _local.updateMessageReactions(chatId, messageId, newReactions);
+    // Remote update
+    await _remote.updateMessageReactions(messageId, newReactions);
+  }
+
+  @override
   Future<void> toggleReaction(String messageId, String userId, String emoji) async {
-    // Implementation for reactions toggle in Supabase
+    // Deprecated in favor of reactToMessage which computes the new map in the viewmodel
   }
 
   @override

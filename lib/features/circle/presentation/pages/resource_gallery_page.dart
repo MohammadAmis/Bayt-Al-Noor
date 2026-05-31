@@ -78,9 +78,9 @@ class ResourceGalleryPage extends ConsumerWidget {
       barrierDismissible: false,
       builder: (ctx) => UploadProgressDialog(
         fileName: file.name,
-        progressStream: notifier.startUpload(file.path, file.name),
+        progressStream: notifier.startUpload(file, file.name),
         onCancel: () {
-          notifier.cancelUpload(file.path);
+          notifier.cancelUpload(file.name);
           Navigator.pop(ctx);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Upload cancelled')));
         },

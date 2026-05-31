@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan/adhan.dart';
 import '../../../../core/services/prayer_service.dart';
 import '../../../../core/services/supabase_service.dart';
+import '../../../../core/providers/services_provider.dart';
 import '../../settings/providers/settings_providers.dart';
 import '../../settings/providers/location_providers.dart';
 
@@ -14,8 +15,8 @@ class PrayerData {
 }
 
 class PrayerDataNotifier extends AsyncNotifier<PrayerData> {
-  final _prayerService = PrayerService.instance;
-  final _supabaseService = SupabaseService.instance;
+  PrayerService get _prayerService => ref.read(prayerServiceProvider);
+  SupabaseService get _supabaseService => ref.read(supabaseServiceProvider);
 
   @override
   Future<PrayerData> build() async {

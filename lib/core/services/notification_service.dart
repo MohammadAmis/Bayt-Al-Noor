@@ -6,9 +6,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
-  static final instance = NotificationService._();
-  NotificationService._();
-  
   FlutterLocalNotificationsPlugin? __plugin;
   FlutterLocalNotificationsPlugin get _plugin {
     if (kIsWeb) throw UnsupportedError('Notifications are not supported on web.');

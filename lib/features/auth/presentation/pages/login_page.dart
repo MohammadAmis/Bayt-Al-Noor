@@ -2,17 +2,19 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../../core/services/supabase_service.dart';
 import '../../../../core/design_tokens.dart';
 
-class LoginPage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/services_provider.dart';
+
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -39,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await SupabaseService.instance.signIn(
+      await ref.read(supabaseServiceProvider).signIn(
         email: email,
         password: password,
       );
@@ -100,7 +102,6 @@ class _LoginPageState extends State<LoginPage> {
           SafeArea(
             child: Column(
               children: [
-                _buildStickyHeader(context),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -120,32 +121,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStickyHeader(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: AppColors.surface,
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Welcome Back',
-            style: AppTypography.display.copyWith(
-              color: AppColors.primaryContainer,
-              fontSize: 24,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.bold,
             ),
           ),
         ],

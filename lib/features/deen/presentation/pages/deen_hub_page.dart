@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../quran/presentation/pages/quran_reading_page.dart';
 import '../../../zakat/presentation/pages/zakat_calculator_page.dart';
-import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../tasbih/presentation/pages/tasbih_page.dart';
 
-class DeenHubPage extends StatelessWidget {
+class DeenHubPage extends ConsumerWidget {
   const DeenHubPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider);
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
         title: 'Deen Hub',
         isMainScreen: true,
         location: 'Deen Hub',
-        onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
-        onProfilePressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const UserProfilePage(
-              name: 'Fatima Al-Sayed',
-              avatarUrl:
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y',
-              bio: 'Seeking tranquility through reflection and prayer.',
-            ),
-          ),
+        onProfilePressed: () => context.push(
+          '/profile',
+          extra: {
+            'name': currentUser?.userMetadata?['full_name'] ?? 'Guest',
+            'avatarUrl': currentUser?.userMetadata?['avatar_url'] ??
+                'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
+            'bio': 'Seeking tranquility through reflection and prayer.',
+            'userId': currentUser?.id,
+          },
         ),
       ),
       body: const SingleChildScrollView(
@@ -51,6 +52,7 @@ class DeenHubPage extends StatelessWidget {
     );
   }
 }
+
 
 class _DeenSearchBar extends StatelessWidget {
   const _DeenSearchBar();

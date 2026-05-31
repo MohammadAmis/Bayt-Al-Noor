@@ -15,6 +15,8 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('settingsBox');
+  await Hive.openBox('forum_drafts');
+  await Hive.openBox('submission_queue');
 
   await Supabase.initialize(
     url: SupabaseSecrets.url,
@@ -50,6 +52,8 @@ class NamazTimerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ✅ Activate orchestrator to start listening for setting changes
     ref.watch(notificationOrchestratorProvider);
+    
+    final router = ref.watch(routerProvider);
     
     return MaterialApp.router(
       routerConfig: router,

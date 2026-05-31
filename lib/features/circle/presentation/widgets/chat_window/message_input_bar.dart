@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../../core/design_tokens.dart';
+import '../../../domain/entities/message_entity.dart';
 
 class MessageInputBar extends StatefulWidget {
-  final Function(String text, bool isImage) onSend;
+  final Function(dynamic data, bool isImage) onSend;
   final VoidCallback onTypingStart;
+  final VoidCallback? onTypingStop;
+  final MessageEntity? replyingTo;   // non-null → user is replying
+  final VoidCallback? onCancelReply;
 
   const MessageInputBar({
     super.key,
     required this.onSend,
     required this.onTypingStart,
+    this.onTypingStop,
+    this.replyingTo,
+    this.onCancelReply,
   });
 
   @override
@@ -23,54 +31,75 @@ class _MessageInputBarState extends State<MessageInputBar> {
   void initState() {
     super.initState();
     _ctrl.addListener(() {
-      setState(() => _hasText = _ctrl.text.trim().isNotEmpty);
-      if (_hasText) widget.onTypingStart();
+      final hasText = _ctrl.text.trim().isNotEmpty;
+      if (hasText != _hasText) {
+        setState(() => _hasText = hasText);
+        if (hasText) {
+          widget.onTypingStart();
+        } else {
+          widget.onTypingStop?.call();
+        }
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
   }
 
   Future<void> _showAttachmentPicker() async {
     final picker = ImagePicker();
-    
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        ),
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle
             Container(
-              width: 40,
+              width: 36,
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.outlineVariant.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
+            Text(
+              'Share Media',
+              style: AppTypography.titleMedium
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
             _buildPickerOption(
               icon: Icons.camera_alt_outlined,
               label: 'Camera',
+              color: AppColors.primary,
               onTap: () async {
                 Navigator.pop(ctx);
-                final photo = await picker.pickImage(source: ImageSource.camera);
-                if (photo != null) widget.onSend(photo.path, true);
+                final photo =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (photo != null) widget.onSend(photo, true);
               },
             ),
             _buildPickerOption(
               icon: Icons.photo_library_outlined,
               label: 'Gallery',
+              color: AppColors.secondary,
               onTap: () async {
                 Navigator.pop(ctx);
-                final image = await picker.pickImage(source: ImageSource.gallery);
-                if (image != null) widget.onSend(image.path, true);
+                final image =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (image != null) widget.onSend(image, true);
               },
             ),
-            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -80,26 +109,34 @@ class _MessageInputBarState extends State<MessageInputBar> {
   Widget _buildPickerOption({
     required IconData icon,
     required String label,
+    required Color color,
     required VoidCallback onTap,
   }) {
     return ListTile(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.blue.withValues(alpha: 0.1),
+          color: color.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.blue),
+        child: Icon(icon, color: color, size: 22),
       ),
-      title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(
+        label,
+        style: AppTypography.bodyMedium
+            .copyWith(fontWeight: FontWeight.bold),
+      ),
       onTap: onTap,
     );
   }
 
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
+  void _sendMessage() {
+    final text = _ctrl.text.trim();
+    if (text.isEmpty) return;
+    widget.onSend(text, false);
+    _ctrl.clear();
+    widget.onTypingStop?.call();
   }
 
   @override
@@ -107,58 +144,116 @@ class _MessageInputBarState extends State<MessageInputBar> {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: Theme.of(context).scaffoldBackgroundColor,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border(
+            top: BorderSide(
+                color: AppColors.outlineVariant.withValues(alpha: 0.15)),
+          ),
+        ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Attachment button
             IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
+              icon: const Icon(Icons.add_circle_outline_rounded,
+                  color: AppColors.onSurfaceVariant),
               onPressed: _showAttachmentPicker,
             ),
+
+            // Text field
             Expanded(
-              child: TextField(
-                controller: _ctrl,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 4,
-                minLines: 1,
-                decoration: InputDecoration(
-                  hintText: 'Type a message...',
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 120),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: TextField(
+                  controller: _ctrl,
+                  textCapitalization: TextCapitalization.sentences,
+                  maxLines: null, // expands naturally
+                  keyboardType: TextInputType.multiline,
+                  style: AppTypography.body
+                      .copyWith(color: AppColors.onSurface, fontSize: 15),
+                  decoration: InputDecoration(
+                    hintText: widget.replyingTo != null
+                        ? 'Reply...'
+                        : 'Type a message...',
+                    hintStyle: AppTypography.body.copyWith(
+                        color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                        fontSize: 15),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  onSubmitted: (_) => _sendMessage(),
                 ),
               ),
             ),
+
             const SizedBox(width: 8),
+
+            // Send / Mic animated button
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
               child: _hasText
-                  ? FloatingActionButton(
+                  ? _ActionButton(
                       key: const ValueKey('send'),
-                      mini: true,
-                      elevation: 2,
-                      backgroundColor: Colors.blue,
-                      child: const Icon(Icons.send, color: Colors.white),
-                      onPressed: () {
-                        widget.onSend(_ctrl.text.trim(), false);
-                        _ctrl.clear();
-                      },
+                      icon: Icons.send_rounded,
+                      color: AppColors.primary,
+                      onTap: _sendMessage,
                     )
-                  : FloatingActionButton(
+                  : _ActionButton(
                       key: const ValueKey('mic'),
-                      mini: true,
-                      elevation: 2,
-                      child: const Icon(Icons.mic),
-                      onPressed: () {
-                        // TODO: Voice recording logic
+                      icon: Icons.mic_rounded,
+                      color: AppColors.secondary,
+                      onTap: () {
+                        // TODO: Voice recording
                       },
                     ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─── Small circular action button ────────────────────────────────────────────
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
       ),
     );
   }

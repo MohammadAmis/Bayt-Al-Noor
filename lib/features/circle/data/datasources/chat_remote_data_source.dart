@@ -13,6 +13,7 @@ abstract class ChatRemoteDataSource {
   Future<List<MessageEntity>> getMessages(String chatId, {int limit = 50, int offset = 0});
   Future<MessageEntity> sendMessage(MessageEntity message);
   Future<void> updateMessageStatus(String messageId, String status);
+  Future<void> updateMessageReactions(String messageId, Map<String, List<String>> reactions);
   Future<void> deleteMessage(String messageId);
   Future<void> markMessageAsDelivered(String messageId);
   
@@ -87,20 +88,31 @@ class SupabaseChatRemoteDataSource implements ChatRemoteDataSource {
       
       data.remove('status'); 
       data.remove('reactions');
-      data.remove('reply_to');
-      data.remove('resource_url');
-      data.remove('resource_metadata');
+      if (data['reply_to'] == null) {
+        data.remove('reply_to');
+      }
       
       data['delivered_to'] = [];
       data['created_at'] = DateTime.now().toUtc().toIso8601String();
       
       // debugPrint('🚀 Sending Message to Supabase: ${data['content']}');
       
-      final response = await _client.from('messages').insert(data).select().single();
+      Map<String, dynamic> response;
+      try {
+        response = await _client.from('messages').insert(data).select().single();
+      } on PostgrestException catch (e) {
+        if (e.code == '23503' && e.message.contains('messages_reply_to_fkey')) {
+          // Fallback: The message we replied to exists locally but was deleted or is missing on the server.
+          // Send it as a normal message instead of crashing.
+          data.remove('reply_to');
+          response = await _client.from('messages').insert(data).select().single();
+        } else {
+          rethrow;
+        }
+      }
+      
       final serverModel = MessageModel.fromJson(response);
       final serverEntity = serverModel.toEntity(currentUserId: _client.auth.currentUser?.id);
-      
-      // debugPrint('✅ Message Accepted by Supabase. New ID: ${serverEntity.id}');
   
       try {
         await _client.from('chats').update({
@@ -121,6 +133,11 @@ class SupabaseChatRemoteDataSource implements ChatRemoteDataSource {
   @override
   Future<void> updateMessageStatus(String messageId, String status) async {
     await _client.from('messages').update({'status': status}).eq('id', messageId);
+  }
+
+  @override
+  Future<void> updateMessageReactions(String messageId, Map<String, List<String>> reactions) async {
+    await _client.from('messages').update({'reactions': reactions}).eq('id', messageId);
   }
 
   @override

@@ -95,8 +95,7 @@ class _QuranReadingPageState extends State<QuranReadingPage> {
                 ],
               ),
               IconButton(
-                icon: const Icon(Icons.settings,
-                    color: AppColors.quranPrimary),
+                icon: const Icon(Icons.settings, color: AppColors.quranPrimary),
                 onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
               ),
             ],
@@ -366,7 +365,8 @@ class _TabNavigation extends StatelessWidget {
                 backgroundColor: isActive
                     ? AppColors.quranPrimary
                     : AppColors.quranSurfaceLow,
-                foregroundColor: isActive ? Colors.white : AppColors.quranOutline,
+                foregroundColor:
+                    isActive ? Colors.white : AppColors.quranOutline,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -442,7 +442,8 @@ class _SurahList extends StatelessWidget {
                       Text(
                         '${surah.ayahs} VERSES • ${index % 2 == 0 ? "MECCAN" : "MEDINAN"}',
                         style: AppTypography.label.copyWith(
-                          color: AppColors.quranOnSurface.withValues(alpha: 0.4),
+                          color:
+                              AppColors.quranOnSurface.withValues(alpha: 0.4),
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.0,
@@ -988,9 +989,11 @@ class _QuranQuickToolsDrawer extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const _FontSlider(label: 'Arabic Font Size', value: 32),
+                          const _FontSlider(
+                              label: 'Arabic Font Size', value: 32),
                           const SizedBox(height: 24),
-                          const _FontSlider(label: 'Translation Font Size', value: 16),
+                          const _FontSlider(
+                              label: 'Translation Font Size', value: 16),
                         ],
                       ),
                     ),
@@ -1181,8 +1184,10 @@ final List<Surah> _quranData = [
   ]),
   Surah('Al-Baqarah', 'البقرة', 'The Cow', 286, []),
   Surah('Al-Kahf', 'الكهف', 'The Cave', 110, [
-    Verse('الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ عِوجًا',
-        '[All] praise is [due] to Allah, who has sent down upon His Servant the Book and has not made therein any deviance.', 1),
+    Verse(
+        'الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ عِوجًا',
+        '[All] praise is [due] to Allah, who has sent down upon His Servant the Book and has not made therein any deviance.',
+        1),
   ]),
   Surah('Al-Furqan', 'الفرقآن', 'The Criterion', 77, [
     Verse(

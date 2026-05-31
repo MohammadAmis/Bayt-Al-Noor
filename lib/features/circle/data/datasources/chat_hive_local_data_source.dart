@@ -74,6 +74,22 @@ class ChatHiveLocalDataSource implements ChatLocalDataSource {
   }
 
   @override
+  Future<void> updateMessageReactions(String chatId, String messageId, Map<String, List<String>> newReactions) async {
+    try {
+      final box = await _getChatBox(chatId);
+      final jsonStr = box.get(messageId);
+      if (jsonStr != null) {
+        final model = MessageModel.fromJson(json.decode(jsonStr));
+        final updatedEntity = model.toEntity().copyWith(reactions: newReactions);
+        final updatedModel = MessageModel.fromEntity(updatedEntity);
+        await box.put(messageId, json.encode(updatedModel.toJson()));
+      }
+    } catch (e) {
+      debugPrint('Error updating reactions in Hive: $e');
+    }
+  }
+
+  @override
   Future<void> deleteMessage(String chatId, String messageId) async {
     try {
       final box = await _getChatBox(chatId);

@@ -19,6 +19,7 @@ abstract class ChatRepository {
   Future<void> resendPendingMessages(String chatId);
   void disposeChatSync(String chatId);
   Future<void> updateMessageStatus(String messageId, MessageStatus status);
+  Future<void> reactToMessage(String chatId, String messageId, Map<String, List<String>> newReactions);
   Future<void> deleteMessage(String messageId);
   Future<void> toggleReaction(String messageId, String userId, String emoji);
 

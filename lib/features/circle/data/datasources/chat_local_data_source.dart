@@ -11,6 +11,7 @@ abstract class ChatLocalDataSource {
   Future<void> cacheMessage(String chatId, MessageEntity message);
   Future<void> deleteMessage(String chatId, String messageId);
   Future<void> queuePendingMessage(String chatId, MessageEntity message);
+  Future<void> updateMessageReactions(String chatId, String messageId, Map<String, List<String>> newReactions);
   
   // Registry Methods (Models returned to allow repository-level resolution)
   Future<void> saveChatRegistry(List<ChatEntity> chats);
@@ -47,6 +48,17 @@ class InMemoryLocalDataSource implements ChatLocalDataSource {
   @override
   Future<void> deleteMessage(String chatId, String messageId) async {
     _cache[chatId]?.removeWhere((m) => m.id == messageId);
+  }
+
+  @override
+  Future<void> updateMessageReactions(String chatId, String messageId, Map<String, List<String>> newReactions) async {
+    final list = _cache[chatId];
+    if (list != null) {
+      final index = list.indexWhere((m) => m.id == messageId);
+      if (index != -1) {
+        list[index] = list[index].copyWith(reactions: newReactions);
+      }
+    }
   }
 
   @override

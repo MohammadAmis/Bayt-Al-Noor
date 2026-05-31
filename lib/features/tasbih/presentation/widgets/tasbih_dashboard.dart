@@ -206,7 +206,7 @@ class _TasbihDashboardState extends State<TasbihDashboard> {
             onTap: () => setState(() => _selectedRange = range),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(100),
@@ -221,10 +221,10 @@ class _TasbihDashboardState extends State<TasbihDashboard> {
               child: Text(
                 range.name.toUpperCase(),
                 style: AppTypography.label.copyWith(
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: FontWeight.w900,
                   color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
-                  letterSpacing: 1.0,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),

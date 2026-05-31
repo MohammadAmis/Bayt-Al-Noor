@@ -137,6 +137,7 @@ class CounterWithActions extends StatelessWidget {
         goal: service.sessionGoal,
         dhikr: service.selectedDhikr,
         onTap: onIncrement,
+        service: service,
       );
     } else {
       return ModernOrbCounter(
@@ -145,6 +146,7 @@ class CounterWithActions extends StatelessWidget {
         dhikr: service.selectedDhikr,
         onTap: onIncrement,
         pulseAnimation: pulseAnimation,
+        service: service,
       );
     }
   }

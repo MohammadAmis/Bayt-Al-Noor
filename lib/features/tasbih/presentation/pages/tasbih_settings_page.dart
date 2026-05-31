@@ -2,35 +2,16 @@ import 'package:flutter/material.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../data/services/tasbih_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/services_provider.dart';
 
-class TasbihSettingsPage extends StatefulWidget {
+class TasbihSettingsPage extends ConsumerWidget {
   const TasbihSettingsPage({super.key});
 
   @override
-  State<TasbihSettingsPage> createState() => _TasbihSettingsPageState();
-}
-
-class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
-  final _service = TasbihService.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _service.addListener(_onServiceUpdate);
-  }
-
-  @override
-  void dispose() {
-    _service.removeListener(_onServiceUpdate);
-    super.dispose();
-  }
-
-  void _onServiceUpdate() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final service = ref.watch(tasbihServiceProvider);
+    
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: const AppTopBar(
@@ -46,22 +27,22 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
           children: [
             _buildSectionHeader('VISUAL STYLE'),
             const SizedBox(height: 16),
-            _buildThemeSelector(),
+            _buildThemeSelector(service),
             const SizedBox(height: 32),
 
             _buildSectionHeader('LANGUAGE & DISPLAY'),
             const SizedBox(height: 16),
-            _buildLanguageCard(),
+            _buildLanguageCard(service),
             const SizedBox(height: 32),
 
             _buildSectionHeader('SENSORY & AUDIO'),
             const SizedBox(height: 16),
-            _buildSensoryCard(),
+            _buildSensoryCard(service),
             const SizedBox(height: 32),
 
             _buildSectionHeader('RITUAL ALERTS'),
             const SizedBox(height: 16),
-            _buildRitualsCard(),
+            _buildRitualsCard(service),
             
             const SizedBox(height: 48),
             
@@ -93,15 +74,15 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
     );
   }
 
-  Widget _buildThemeSelector() {
+  Widget _buildThemeSelector(TasbihService service) {
     return Row(
       children: [
         Expanded(
           child: _ThemePreviewCard(
             title: 'Modern Orb',
             subtitle: 'Celestial focus',
-            isSelected: _service.counterStyle == CounterStyle.orb,
-            onTap: () => _service.setCounterStyle(CounterStyle.orb),
+            isSelected: service.counterStyle == CounterStyle.orb,
+            onTap: () => service.setCounterStyle(CounterStyle.orb),
             icon: Icons.auto_awesome,
           ),
         ),
@@ -110,8 +91,8 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
           child: _ThemePreviewCard(
             title: 'Classic Beads',
             subtitle: 'Traditional feel',
-            isSelected: _service.counterStyle == CounterStyle.beads,
-            onTap: () => _service.setCounterStyle(CounterStyle.beads),
+            isSelected: service.counterStyle == CounterStyle.beads,
+            onTap: () => service.setCounterStyle(CounterStyle.beads),
             icon: Icons.grain,
           ),
         ),
@@ -119,32 +100,32 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
     );
   }
 
-  Widget _buildLanguageCard() {
+  Widget _buildLanguageCard(TasbihService service) {
     return BentoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _buildLangModeItem('Arabic', LanguageMode.arabic),
+              _buildLangModeItem('Arabic', LanguageMode.arabic, service),
               const SizedBox(width: 8),
-              _buildLangModeItem('English', LanguageMode.english),
+              _buildLangModeItem('English', LanguageMode.english, service),
             ],
           ),
-          if (_service.languageMode == LanguageMode.english) ...[
+          if (service.languageMode == LanguageMode.english) ...[
             const Divider(height: 32, thickness: 0.5),
             _buildToggleRow(
               'Transliteration',
               'English phonetic reading',
-              _service.isTransliterationVisible,
-              (val) => _service.toggleTransliteration(val),
+              service.isTransliterationVisible,
+              (val) => service.toggleTransliteration(val),
             ),
             const Divider(height: 32, thickness: 0.5),
             _buildToggleRow(
               'Translation',
               'English meaning',
-              _service.isTranslationVisible,
-              (val) => _service.toggleTranslation(val),
+              service.isTranslationVisible,
+              (val) => service.toggleTranslation(val),
             ),
           ],
         ],
@@ -152,11 +133,11 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
     );
   }
 
-  Widget _buildLangModeItem(String label, LanguageMode mode) {
-    bool isSelected = _service.languageMode == mode;
+  Widget _buildLangModeItem(String label, LanguageMode mode, TasbihService service) {
+    bool isSelected = service.languageMode == mode;
     return Expanded(
       child: GestureDetector(
-        onTap: () => _service.setLanguageMode(mode),
+        onTap: () => service.setLanguageMode(mode),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -180,7 +161,7 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
     );
   }
 
-  Widget _buildSensoryCard() {
+  Widget _buildSensoryCard(TasbihService service) {
     return BentoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +186,7 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
                 ],
               ),
               Text(
-                '${(_service.hapticIntensity * 100).toInt()}%',
+                '${(service.hapticIntensity * 100).toInt()}%',
                 style: AppTypography.label.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -214,19 +195,19 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
             ],
           ),
           Slider(
-            value: _service.hapticIntensity,
-            onChanged: (val) => _service.setHapticIntensity(val),
+            value: service.hapticIntensity,
+            onChanged: (val) => service.setHapticIntensity(val),
             activeColor: AppColors.primary,
             inactiveColor: AppColors.outlineVariant.withValues(alpha: 0.2),
           ),
           const Divider(height: 32, thickness: 0.5),
-          _buildSoundSelector(),
+          _buildSoundSelector(service),
         ],
       ),
     );
   }
 
-  Widget _buildSoundSelector() {
+  Widget _buildSoundSelector(TasbihService service) {
     final profiles = ['None', 'Click', 'Water Drop', 'Celestial Pulse'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,9 +225,9 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final profile = profiles[index];
-              final isSelected = _service.selectedSoundProfile == profile;
+              final isSelected = service.selectedSoundProfile == profile;
               return GestureDetector(
-                onTap: () => _service.setSoundProfile(profile),
+                onTap: () => service.setSoundProfile(profile),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -272,7 +253,7 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
     );
   }
 
-  Widget _buildRitualsCard() {
+  Widget _buildRitualsCard(TasbihService service) {
     return BentoCard(
       child: Column(
         children: [
@@ -286,8 +267,8 @@ class _TasbihSettingsPageState extends State<TasbihSettingsPage> {
           _buildToggleRow(
             'Auto-Series Switch',
             'Move to next Dhikr at goal',
-            _service.isSeriesMode,
-            (val) => _service.toggleSeriesMode(val),
+            service.isSeriesMode,
+            (val) => service.toggleSeriesMode(val),
           ),
         ],
       ),

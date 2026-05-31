@@ -11,8 +11,8 @@ class CommunityApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      routerConfig: router,
-      title: 'Community App',
+      routerConfig: ref.watch(routerProvider),
+      title: 'Bayt-Ul-Noor',
       debugShowCheckedModeBanner: false,
       
       // 🎨 Theme Configuration

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -6,15 +7,16 @@ import '../../data/providers/chat_providers.dart';
 import '../../domain/entities/chat_entity.dart';
 import 'chat_page.dart';
 import 'user_selection_page.dart';
+import '../../../../core/providers/services_provider.dart';
 
-class CommunityPage extends ConsumerStatefulWidget {
-  const CommunityPage({super.key});
+class CirclePage extends ConsumerStatefulWidget {
+  const CirclePage({super.key});
 
   @override
-  ConsumerState<CommunityPage> createState() => _CommunityPageState();
+  ConsumerState<CirclePage> createState() => _CirclePageState();
 }
 
-class _CommunityPageState extends ConsumerState<CommunityPage> {
+class _CirclePageState extends ConsumerState<CirclePage> {
   String _activeFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
 
@@ -27,6 +29,7 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
   @override
   Widget build(BuildContext context) {
     final chatListAsync = ref.watch(chatListProvider);
+    final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -34,7 +37,16 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
         title: 'Circle',
         isMainScreen: true,
         location: 'Circle',
-        onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
+        onProfilePressed: () => context.push(
+          '/profile',
+          extra: {
+            'name': currentUser?.userMetadata?['full_name'] ?? 'Guest',
+            'avatarUrl': currentUser?.userMetadata?['avatar_url'] ??
+                'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
+            'bio': 'Seeking tranquility through reflection and prayer.',
+            'userId': currentUser?.id,
+          },
+        ),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 80.0),
@@ -55,7 +67,8 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
           child: FloatingActionButton(
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UserSelectionPage()),
+              MaterialPageRoute(
+                  builder: (context) => const UserSelectionPage()),
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -66,12 +79,12 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
       body: chatListAsync.when(
         data: (chats) {
           final filteredChats = chats.where((chat) {
-      final matchesFilter = switch (_activeFilter) {
-        'Groups' => chat.type == 'group',
-        'Private' => chat.type == 'private',
-        'Pinned' => chat.isPinned,
-        _ => true,
-      };
+            final matchesFilter = switch (_activeFilter) {
+              'Groups' => chat.type == 'group',
+              'Private' => chat.type == 'private',
+              'Pinned' => chat.isPinned,
+              _ => true,
+            };
 
             final matchesSearch = chat.displayTitle
                 .toLowerCase()
@@ -107,9 +120,12 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Sanctuary?'),
-        content: Text('Are you sure you want to remove "$chatName"? This will delete all messages for everyone.'),
+        content: Text(
+            'Are you sure you want to remove "$chatName"? This will delete all messages for everyone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Keep')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -124,7 +140,7 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
         await ref.read(chatRepositoryProvider).deleteChat(chatId);
         // Explicitly invalidate to force a fresh fetch from remote
         ref.invalidate(chatListProvider);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sanctuary removed.')),
@@ -213,7 +229,8 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(40.0),
-          child: Text('No active chats', style: TextStyle(color: Colors.grey[600])),
+          child: Text('No active chats',
+              style: TextStyle(color: Colors.grey[600])),
         ),
       );
     }
@@ -227,18 +244,22 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: chats.length,
-        separatorBuilder: (_, __) => const Divider(height: 1, indent: 80, endIndent: 20),
+        separatorBuilder: (_, __) =>
+            const Divider(height: 1, indent: 80, endIndent: 20),
         itemBuilder: (context, index) {
           final chat = chats[index];
           return _ChatItem(
             chatId: chat.id,
+            chatType: chat.type, // ✅ pass real type
             title: chat.displayTitle,
             subtitle: chat.lastMessagePreview ?? 'No messages yet',
             time: _formatLastMessageTime(chat.lastMessageTime),
             unreadCount: chat.unreadCount,
-            leading: chat.avatarUrl != null 
-                ? _buildImageAvatar(chat.avatarUrl!) 
-                : _buildInitialAvatar(chat.displayTitle.isNotEmpty ? chat.displayTitle[0] : '?', AppColors.primaryFixedDim),
+            leading: chat.avatarUrl != null
+                ? _buildImageAvatar(chat.avatarUrl!)
+                : _buildInitialAvatar(
+                    chat.displayTitle.isNotEmpty ? chat.displayTitle[0] : '?',
+                    AppColors.primaryFixedDim),
             onDelete: () => _confirmDeleteChat(chat.id, chat.displayTitle),
           );
         },
@@ -249,7 +270,9 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
   String _formatLastMessageTime(DateTime? time) {
     if (time == null) return '';
     final localTime = time.toLocal();
-    final hour = localTime.hour == 0 ? 12 : (localTime.hour > 12 ? localTime.hour - 12 : localTime.hour);
+    final hour = localTime.hour == 0
+        ? 12
+        : (localTime.hour > 12 ? localTime.hour - 12 : localTime.hour);
     final minute = localTime.minute.toString().padLeft(2, '0');
     final amPm = localTime.hour >= 12 ? 'PM' : 'AM';
     return "$hour:$minute $amPm";
@@ -264,9 +287,7 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
         child: Text(
           text,
           style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
     );
@@ -287,6 +308,7 @@ class _CommunityPageState extends ConsumerState<CommunityPage> {
 
 class _ChatItem extends StatelessWidget {
   final String chatId;
+  final String chatType; // 'private' | 'group' | 'community'
   final String title;
   final String subtitle;
   final String time;
@@ -296,6 +318,7 @@ class _ChatItem extends StatelessWidget {
 
   const _ChatItem({
     required this.chatId,
+    required this.chatType,
     required this.title,
     required this.subtitle,
     required this.time,
@@ -314,7 +337,8 @@ class _ChatItem extends StatelessWidget {
             builder: (context) => ChatPage(
               chatId: chatId,
               chatTitle: title,
-              chatAvatar: null, // Can extract from leading if needed
+              chatType: chatType, // ✅ real type from ChatEntity
+              chatAvatar: null,
             ),
           ),
         );
@@ -362,10 +386,7 @@ class _ChatItem extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.outline, size: 20),
-              onPressed: onDelete,
-            ),
+            
           ],
         ),
       ),

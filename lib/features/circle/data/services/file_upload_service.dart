@@ -1,62 +1,54 @@
-import 'dart:io';
 import 'dart:async';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../core/services/cloudinary_service.dart';
 
 class FileUploadService {
-  final String bucketName;
-  FileUploadService({this.bucketName = 'community-resources'});
+  final CloudinaryService _cloudinary = CloudinaryService();
 
-  Future<String> uploadWithProgress({
-    required String filePath,
+  /// Cross-platform upload: uses Cloudinary.
+  Future<String> uploadXFile({
+    required XFile xFile,
     required String chatId,
-    required String fileName,
     required StreamController<double> progressController,
   }) async {
-    final file = File(filePath);
-    final storagePath = '$chatId/${DateTime.now().millisecondsSinceEpoch}_$fileName';
-
     try {
-      // Supabase Flutter SDK doesn't expose native upload progress.
-      // We simulate realistic progress updates for UX, then trigger actual upload.
-      // For production-grade progress, use Dio + StreamedRequest or chunked uploads.
-      await _simulateProgress(progressController, file.lengthSync());
+      final resourceType = _guessResourceType(xFile.name);
       
-      await Supabase.instance.client.storage.from(bucketName).upload(
-        storagePath,
-        file,
-        fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+      final response = await _cloudinary.uploadFile(
+        file: xFile,
+        resourceType: resourceType,
+        folder: 'bayt_al_noor/circle/$chatId',
+        onProgress: (progress) {
+          if (!progressController.isClosed) {
+            progressController.add(progress);
+          }
+        },
       );
-      
+
+      if (response == null) {
+        throw Exception('Cloudinary returned null');
+      }
+
       progressController.add(1.0);
-      return Supabase.instance.client.storage.from(bucketName).getPublicUrl(storagePath);
+      return response.secureUrl;
     } catch (e) {
       progressController.addError(e);
+      debugPrint('❌ FileUploadService.uploadXFile failed: $e');
       throw Exception('Upload failed: $e');
     }
   }
 
   Future<List<Map<String, dynamic>>> listChatResources(String chatId) async {
-    final items = await Supabase.instance.client.storage.from(bucketName).list(path: chatId);
-    return items.map((item) => {
-      'name': item.name,
-      'path': item.id,
-      'size': item.metadata?['size'] ?? 0,
-      'type': _mapExtension(item.name.split('.').last),
-      'url': Supabase.instance.client.storage.from(bucketName).getPublicUrl('$chatId/${item.name}'),
-    }).toList();
+    // Cloudinary doesn't easily allow listing by prefix securely on client side.
+    // For now, we return an empty list or we could fetch from DB metadata.
+    return [];
   }
 
-  Future<void> _simulateProgress(StreamController<double> controller, int fileSize) async {
-    // Simulate chunked progress (0.1 -> 0.9) before SDK finishes
-    for (double i = 0.1; i < 1.0; i += 0.15) {
-      await Future.delayed(const Duration(milliseconds: 200));
-      if (!controller.isClosed) controller.add(i);
-    }
-  }
-
-  String _mapExtension(String ext) {
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)) return 'image';
+  String _guessResourceType(String fileName) {
+    final ext = fileName.split('.').last.toLowerCase();
     if (['mp4', 'mov', 'avi', 'mkv'].contains(ext)) return 'video';
-    return 'document';
+    return 'image';
   }
+
 }

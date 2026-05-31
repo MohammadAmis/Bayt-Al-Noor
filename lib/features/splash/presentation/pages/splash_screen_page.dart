@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/design_tokens.dart';
 import 'dart:math' as math;
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_svgs.dart';
 
 class SplashScreenPage extends StatefulWidget {
   const SplashScreenPage({super.key});
@@ -267,13 +269,13 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                 width: 1,
               ),
             ),
-            child: Image.asset(
-              'assets/logo_kufic.png',
-              fit: BoxFit.contain, // Change to contain
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.auto_awesome_motion,
-                color: AppColors.secondary,
-                size: 48,
+            child: SvgPicture.string(
+              AppSvgs.logo,
+              width: 80,
+              height: 80,
+              colorFilter: const ColorFilter.mode(
+                AppColors.secondary,
+                BlendMode.srcIn,
               ),
             ),
           ),

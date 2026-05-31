@@ -4,9 +4,7 @@ import '../../features/circle/domain/repositories/chat_repository.dart';
 import '../../features/circle/data/models/profile_model.dart';
 
 class SupabaseService {
-  static final SupabaseService instance = SupabaseService._internal();
-  factory SupabaseService() => instance;
-  SupabaseService._internal();
+  SupabaseService();
 
   final SupabaseClient _client = Supabase.instance.client;
 

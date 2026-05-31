@@ -152,6 +152,7 @@ class _UserSelectionPageState extends ConsumerState<UserSelectionPage> {
               chatId: existingChatId,
               chatTitle: user.fullName,
               chatAvatar: user.avatarUrl,
+              chatType: 'private', // ✅ 1-on-1
             ),
           ),
         );
@@ -164,6 +165,7 @@ class _UserSelectionPageState extends ConsumerState<UserSelectionPage> {
               chatId: 'draft_${user.id}',
               chatTitle: user.fullName,
               chatAvatar: user.avatarUrl,
+              chatType: 'private', // ✅ 1-on-1
               initialProfile: user,
             ),
           ),

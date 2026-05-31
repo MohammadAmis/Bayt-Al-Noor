@@ -6,9 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PrayerService {
-  static final PrayerService instance = PrayerService._internal();
-  factory PrayerService() => instance;
-  PrayerService._internal();
+  PrayerService();
 
   /// Fetches the user's current coordinates.
   /// Falls back to Supabase profile or Mumbai if GPS is unavailable.
@@ -38,7 +36,7 @@ class PrayerService {
     Madhab madhab = Madhab.hanafi,
   }) async {
     final coordinates = Coordinates(
-        latitude ?? 51.5074, longitude ?? -0.1278); // Default to London
+        latitude ?? 19.0760, longitude ?? 72.8777); // Default to Mumbai
     final params = method.getParameters();
     params.madhab = madhab;
 
@@ -88,7 +86,7 @@ class PrayerService {
         }
       }
     } catch (e) {
-      debugPrint('Web Geocoding Error: $e');
+      // debugPrint('Web Geocoding Error: $e');
     }
     return 'Current Location';
   }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../core/widgets/common_widgets.dart';
-import '../../data/services/tasbih_service.dart';
-import '../../../profile/presentation/pages/profile_page.dart';
 import '../widgets/tasbih_dashboard.dart';
 import '../widgets/dhikr_carousel.dart';
 import '../widgets/counter_with_actions.dart';
@@ -10,16 +9,18 @@ import '../widgets/goal_management.dart';
 import '../widgets/dhikr_info_card.dart';
 import './tasbih_settings_page.dart';
 
-class TasbihPage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/services_provider.dart';
+
+class TasbihPage extends ConsumerStatefulWidget {
   const TasbihPage({super.key});
 
   @override
-  State<TasbihPage> createState() => _TasbihPageState();
+  ConsumerState<TasbihPage> createState() => _TasbihPageState();
 }
 
-class _TasbihPageState extends State<TasbihPage>
+class _TasbihPageState extends ConsumerState<TasbihPage>
     with SingleTickerProviderStateMixin {
-  final TasbihService _service = TasbihService.instance;
   late AnimationController _rippleController;
   final TextEditingController _customGoalController = TextEditingController();
 
@@ -30,69 +31,54 @@ class _TasbihPageState extends State<TasbihPage>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    
-    // Initialize service and listen for changes
-    _service.initialize();
-    _service.addListener(_onServiceUpdate);
-  }
 
-  void _onServiceUpdate() {
-    if (mounted) setState(() {});
+    // Initialize service
+    Future.microtask(() => ref.read(tasbihServiceProvider).initialize());
   }
 
   @override
   void dispose() {
-    _service.removeListener(_onServiceUpdate);
     _rippleController.dispose();
     _customGoalController.dispose();
     super.dispose();
   }
 
   void _increment() {
-    _service.increment();
+    ref.read(tasbihServiceProvider).increment();
     _rippleController.forward(from: 0.0);
   }
 
   void _reset() {
-    _service.resetSession();
+    ref.read(tasbihServiceProvider).resetSession();
   }
 
   void _setGoal(int goal) {
-    _service.setGoal(goal);
+    ref.read(tasbihServiceProvider).setGoal(goal);
     _customGoalController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_service.isInitialized) {
+    final service = ref.watch(tasbihServiceProvider);
+
+    if (!service.isInitialized) {
       return const Scaffold(
         backgroundColor: AppColors.surface,
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
         title: 'Tasbih',
-        isMainScreen: true,
+        isMainScreen: false,
         location: 'Tasbih',
         onSettingsPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const TasbihSettingsPage()),
         ),
-        onProfilePressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const UserProfilePage(
-              name: 'Fatima Al-Sayed',
-              avatarUrl:
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBTsguL1thXHygl49n-buglmiegAxbwbxDG_0bz8DyMlY4B9PpbOsKMGjNK9LK1xRQeDx8dUwdqiVdvRz_FYFD5Uqqk2-bY4xdF1eQf9RqHESqq4ypt0k7zaDjDKLW0ELh8RVEnj-u2McOpnuf_39Nx27EZlDnizOq3GYfaQ45eQibevgJ3MnbdMjy0DpTxF_Hrc-tke3MtJ981TVt7wVc1CzSGJ70wPDhNo111GDqA5JnVPqhTyUjwaaGOpXZbKdmE3YxkoveBb4Y',
-              bio: 'Seeking tranquility through reflection and prayer.',
-            ),
-          ),
-        ),
+        onProfilePressed: () => context.push('/profile'),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -104,13 +90,13 @@ class _TasbihPageState extends State<TasbihPage>
           child: Column(
             children: [
               // Dhikr Horizontal Selector
-              DhikrCarousel(service: _service),
+              DhikrCarousel(service: service),
 
               const SizedBox(height: 40),
 
               // Dynamic Counter with integrated Reset
               CounterWithActions(
-                service: _service,
+                service: service,
                 pulseAnimation: _rippleController,
                 onIncrement: _increment,
                 onReset: _reset,
@@ -120,7 +106,7 @@ class _TasbihPageState extends State<TasbihPage>
 
               // Goal Management
               GoalManagement(
-                service: _service,
+                service: service,
                 customGoalController: _customGoalController,
                 onSetGoal: _setGoal,
               ),
@@ -128,12 +114,12 @@ class _TasbihPageState extends State<TasbihPage>
               const SizedBox(height: 32),
 
               // New Insights Dashboard
-              TasbihDashboard(service: _service),
+              TasbihDashboard(service: service),
 
               const SizedBox(height: 32),
 
               // Descriptive Info Card
-              DhikrInfoCard(service: _service),
+              DhikrInfoCard(service: service),
             ],
           ),
         ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../states/resource_state.dart';
@@ -43,13 +44,13 @@ class ResourceViewModel extends _$ResourceViewModel {
     }
   }
 
-  Stream<double> startUpload(String filePath, String fileName) {
+  Stream<double> startUpload(XFile xFile, String fileName) {
     final controller = StreamController<double>();
-    _uploadStreams[filePath] = controller;
+    _uploadStreams[fileName] = controller;
     state = state.copyWith(activeUploadFile: fileName);
 
     unawaited(
-      _performUpload(filePath, fileName, controller).then((url) {
+      _performUpload(xFile, fileName, controller).then((url) {
         // 1. Save metadata to Supabase DB
         ref.read(chatRepositoryProvider).shareResource(
           chatId, url, _getResourceType(fileName).name, {}
@@ -60,7 +61,7 @@ class ResourceViewModel extends _$ResourceViewModel {
         controller.addError(e);
       }).whenComplete(() {
         controller.close();
-        _uploadStreams.remove(filePath);
+        _uploadStreams.remove(fileName);
         state = state.copyWith(activeUploadFile: null);
       })
     );
@@ -68,17 +69,16 @@ class ResourceViewModel extends _$ResourceViewModel {
     return controller.stream;
   }
 
-  void cancelUpload(String filePath) {
-    _uploadStreams[filePath]?.close();
-    _uploadStreams.remove(filePath);
+  void cancelUpload(String fileName) {
+    _uploadStreams[fileName]?.close();
+    _uploadStreams.remove(fileName);
     state = state.copyWith(activeUploadFile: null);
   }
 
-  Future<String> _performUpload(String path, String name, StreamController<double> ctrl) async {
-    return FileUploadService().uploadWithProgress(
-      filePath: path,
+  Future<String> _performUpload(XFile xFile, String name, StreamController<double> ctrl) async {
+    return FileUploadService().uploadXFile(
+      xFile: xFile,
       chatId: chatId,
-      fileName: name,
       progressController: ctrl,
     );
   }

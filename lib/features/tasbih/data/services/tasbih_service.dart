@@ -11,9 +11,9 @@ enum CounterStyle { beads, orb }
 enum LanguageMode { arabic, english }
 
 class TasbihService with ChangeNotifier {
-  static final TasbihService instance = TasbihService._internal();
-  factory TasbihService() => instance;
-  TasbihService._internal() {
+  final SupabaseService _supabaseService;
+
+  TasbihService({required SupabaseService supabaseService}) : _supabaseService = supabaseService {
     _initAudio();
   }
 
@@ -84,6 +84,8 @@ class TasbihService with ChangeNotifier {
   static const String _keyHapticIntensity = 'tasbih_haptic_intensity';
   static const String _keyHistory = 'tasbih_history';
 
+  static get instance => null;
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -147,10 +149,10 @@ class TasbihService with ChangeNotifier {
   Future<void> _syncFromSupabase() async {
     if (!_syncEnabled) return;
 
-    final user = SupabaseService.instance.currentUser;
+    final user = _supabaseService.currentUser;
     if (user != null) {
       try {
-        final profile = await SupabaseService.instance.getUserProfile(user.id);
+        final profile = await _supabaseService.getUserProfile(user.id);
         if (profile != null) {
           _lifetimeTotal = profile.tasbihTotal > _lifetimeTotal
               ? profile.tasbihTotal
@@ -433,10 +435,10 @@ class TasbihService with ChangeNotifier {
   Future<void> _syncToSupabase() async {
     if (!_syncEnabled) return;
 
-    final user = SupabaseService.instance.currentUser;
+    final user = _supabaseService.currentUser;
     if (user != null) {
       try {
-        await SupabaseService.instance.updateUserProfile(
+        await _supabaseService.updateUserProfile(
           userId: user.id,
           tasbihTotal: _lifetimeTotal,
           tasbihStreak: _streak,

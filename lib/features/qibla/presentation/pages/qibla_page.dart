@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
+import '../../../../core/providers/services_provider.dart';
 // ✅ Core
 import '../../../../../core/design_tokens.dart';
 import '../../../../../core/widgets/common_widgets.dart';
@@ -58,7 +59,7 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
 
     // Watch Qibla state
     final qiblaState = ref.watch(qiblaProvider);
-
+    final currentUser = ref.watch(currentUserProvider);
     // ✅ Watch your existing location provider
     final locationAsync = ref.watch(locationProvider);
 
@@ -67,9 +68,18 @@ class _QiblaPageState extends ConsumerState<QiblaPage> {
       backgroundColor: AppColors.surface,
       appBar: AppTopBar(
         title: 'Qibla',
-        isMainScreen: false,
+        isMainScreen: true,
         location: 'Qibla Finder',
-        onSettingsPressed: () => Navigator.pushNamed(context, '/settings'),
+        onProfilePressed: () => context.push(
+              '/profile',
+              extra: {
+                'name': currentUser?.userMetadata?['full_name'] ?? 'Guest',
+                'avatarUrl': currentUser?.userMetadata?['avatar_url'] ??
+                    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
+                'bio': 'Seeking tranquility through reflection and prayer.',
+                'userId': currentUser?.id,
+              },
+            ),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

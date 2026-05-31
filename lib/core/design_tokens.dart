@@ -250,7 +250,7 @@ class AppColors {
 }
 
 class AppTypography {
-  // Serif (Spiritual feel)
+  // Base Tokens
   static TextStyle get display => GoogleFonts.amiri(
         fontSize: 32,
         fontWeight: FontWeight.bold,
@@ -260,7 +260,6 @@ class AppTypography {
         fontWeight: FontWeight.bold,
       );
 
-  // Clean UI
   static TextStyle get body => GoogleFonts.inter();
 
   static TextStyle get title => GoogleFonts.inter(
@@ -271,6 +270,27 @@ class AppTypography {
         fontSize: 12,
         fontWeight: FontWeight.w500,
       );
+
+  // Standard Material 3 Roles
+  static TextStyle get displayLarge => display.copyWith(fontSize: 57);
+  static TextStyle get displayMedium => display.copyWith(fontSize: 45);
+  static TextStyle get displaySmall => display.copyWith(fontSize: 36);
+
+  static TextStyle get headlineLarge => headline.copyWith(fontSize: 32);
+  static TextStyle get headlineMedium => headline.copyWith(fontSize: 28);
+  static TextStyle get headlineSmall => headline.copyWith(fontSize: 24);
+
+  static TextStyle get titleLarge => title.copyWith(fontSize: 22);
+  static TextStyle get titleMedium => title.copyWith(fontSize: 16);
+  static TextStyle get titleSmall => title.copyWith(fontSize: 14);
+
+  static TextStyle get bodyLarge => body.copyWith(fontSize: 16);
+  static TextStyle get bodyMedium => body.copyWith(fontSize: 14);
+  static TextStyle get bodySmall => body.copyWith(fontSize: 12);
+
+  static TextStyle get labelLarge => label.copyWith(fontSize: 14);
+  static TextStyle get labelMedium => label.copyWith(fontSize: 12);
+  static TextStyle get labelSmall => label.copyWith(fontSize: 11);
 
   // Special UI
   static TextStyle get compassDirection => headline.copyWith(fontSize: 24);
